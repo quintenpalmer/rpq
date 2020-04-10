@@ -188,17 +188,35 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
 pub fn index<'a>() -> elements::Body<'a> {
     elements::Body::style_less(vec![
         htmldsl::tag(Box::new(elements::H1::style_less(vec![htmldsl::text(
-            "hi there".into(),
+            "the map".into(),
         )]))),
         models::Display {
             map: models::Map {
                 default_terrain: models::Terrain::Grass,
-                specified_terrain: vec![
-                    ((3, 3), models::Terrain::Dirt),
-                    ((3, 4), models::Terrain::Rock),
-                ]
-                .into_iter()
-                .collect::<BTreeMap<_, _>>(),
+                specified_terrain: (0..12)
+                    .into_iter()
+                    .map(|i| ((9, i), models::Terrain::Dirt))
+                    .chain(
+                        (0..12)
+                            .into_iter()
+                            .map(|i| ((10, i), models::Terrain::Dirt)),
+                    )
+                    .chain(
+                        (0..12)
+                            .into_iter()
+                            .map(|i| ((i, 10), models::Terrain::Dirt)),
+                    )
+                    .chain(
+                        (0..12)
+                            .into_iter()
+                            .map(|i| ((11, i), models::Terrain::Rock)),
+                    )
+                    .chain(
+                        (0..12)
+                            .into_iter()
+                            .map(|i| ((i, 11), models::Terrain::Rock)),
+                    )
+                    .collect::<BTreeMap<_, _>>(),
                 characters: vec![
                     ((4, 3), models::Character::Knight),
                     ((5, 5), models::Character::Mage),
@@ -206,8 +224,8 @@ pub fn index<'a>() -> elements::Body<'a> {
                 ]
                 .into_iter()
                 .collect::<BTreeMap<_, _>>(),
-                hint_max_x: 17,
-                hint_max_y: 17,
+                hint_max_x: 12,
+                hint_max_y: 12,
             },
             current_selection: (4, 5),
         }
