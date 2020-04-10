@@ -3,3 +3,7 @@ pub enum Terrain {
     Dirt,
     Rock,
 }
+
+pub struct Map {
+    pub default_terrain: Terrain,
+}

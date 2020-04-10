@@ -15,10 +15,22 @@ impl models::Terrain {
     }
 }
 
+impl models::Map {
+    fn into_html(&self) -> String {
+        format!(
+            "<table><tbody><tr><td>{}</td></tr></tbody></table>",
+            self.default_terrain.into_html()
+        )
+    }
+}
+
 pub fn index() -> String {
     format!(
         "<html><body><h1>hi there</h1><p>{}</p></body></html>",
-        models::Terrain::Grass.into_html()
+        models::Map {
+            default_terrain: models::Terrain::Grass,
+        }
+        .into_html()
     )
 }
 
