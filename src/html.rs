@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use htmldsl::attributes;
 use htmldsl::elements;
 use htmldsl::units;
@@ -45,9 +47,34 @@ impl models::Terrain {
 
 impl models::Map {
     fn into_html(&self) -> htmldsl::Element {
-        htmldsl::tag(Box::new(elements::Table::style_less_from_vecs(
+        let (max_x, max_y) = self.maxes();
+        let mut empty_rendered_map: Vec<Vec<models::Terrain>> = (0..max_x)
+            .into_iter()
+            .map(|_| {
+                (0..max_y)
+                    .into_iter()
+                    .map(|_| self.default_terrain.clone())
+                    .collect()
+            })
+            .collect();
+        for ((x, y), terrain) in self.specified_terrain.iter() {
+            empty_rendered_map[*x as usize][*y as usize] = terrain.clone();
+        }
+
+        htmldsl::tag(Box::new(elements::Table::style_less(
             None,
-            vec![vec![self.default_terrain.into_html()]],
+            elements::Tbody::style_less(
+                empty_rendered_map
+                    .into_iter()
+                    .map(|row| {
+                        elements::Tr::style_less(
+                            row.into_iter()
+                                .map(|data| elements::Td::style_less(vec![data.into_html()]))
+                                .collect(),
+                        )
+                    })
+                    .collect(),
+            ),
         )))
     }
 }
@@ -59,6 +86,14 @@ pub fn index<'a>() -> elements::Body<'a> {
         )]))),
         models::Map {
             default_terrain: models::Terrain::Grass,
+            specified_terrain: vec![
+                ((3, 3), models::Terrain::Dirt),
+                ((3, 4), models::Terrain::Rock),
+            ]
+            .into_iter()
+            .collect::<BTreeMap<_, _>>(),
+            hint_max_x: 17,
+            hint_max_y: 17,
         }
         .into_html(),
     ])
