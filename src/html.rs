@@ -72,6 +72,13 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
     htmldsl::render_simple_html_page(true, html)
 }
 
+fn current_selection_marker() -> htmldsl::Element {
+    htmldsl::tag(Box::new(
+        elements::Img::style_less_with_src("/images/marker.png".to_string())
+            .add_style(vec![&styles::Display::Block, &styles::Position::Absolute]),
+    ))
+}
+
 impl models::Terrain {
     fn into_html(&self) -> htmldsl::Element {
         htmldsl::tag(Box::new(
@@ -109,24 +116,28 @@ impl models::Character {
 }
 
 impl models::Map {
-    fn into_html(&self) -> htmldsl::Element {
+    fn into_html(&self, current_selection: Option<(u32, u32)>) -> htmldsl::Element {
         let (max_x, max_y) = self.maxes();
-        let mut empty_rendered_map: Vec<Vec<(models::Terrain, Option<models::Character>)>> = (0
-            ..max_x)
-            .into_iter()
-            .map(|_| {
-                (0..max_y)
-                    .into_iter()
-                    .map(|_| (self.default_terrain.clone(), None))
-                    .collect()
-            })
-            .collect();
+        let mut empty_rendered_map: Vec<Vec<(models::Terrain, Option<models::Character>, bool)>> =
+            (0..max_x)
+                .into_iter()
+                .map(|_| {
+                    (0..max_y)
+                        .into_iter()
+                        .map(|_| (self.default_terrain.clone(), None, false))
+                        .collect()
+                })
+                .collect();
         for ((x, y), terrain) in self.specified_terrain.iter() {
             empty_rendered_map[*x as usize][*y as usize].0 = terrain.clone();
         }
         for ((x, y), character) in self.characters.iter() {
             empty_rendered_map[*x as usize][*y as usize].1 = Some(character.clone());
         }
+        match current_selection {
+            Some((x, y)) => empty_rendered_map[x as usize][y as usize].2 = true,
+            None => (),
+        };
 
         htmldsl::tag(Box::new(elements::Table::style_less(
             None,
@@ -138,8 +149,15 @@ impl models::Map {
                             row.into_iter()
                                 .map(|data| {
                                     elements::Td::style_less(maybe_append(
-                                        vec![data.0.into_html()],
-                                        data.1.map(|x| x.into_html()),
+                                        maybe_append(
+                                            vec![data.0.into_html()],
+                                            data.1.map(|x| x.into_html()),
+                                        ),
+                                        if data.2 {
+                                            Some(current_selection_marker())
+                                        } else {
+                                            None
+                                        },
                                     ))
                                 })
                                 .collect(),
@@ -148,6 +166,12 @@ impl models::Map {
                     .collect(),
             ),
         )))
+    }
+}
+
+impl models::Display {
+    fn into_html(&self) -> htmldsl::Element {
+        self.map.into_html(Some(self.current_selection))
     }
 }
 
@@ -166,23 +190,26 @@ pub fn index<'a>() -> elements::Body<'a> {
         htmldsl::tag(Box::new(elements::H1::style_less(vec![htmldsl::text(
             "hi there".into(),
         )]))),
-        models::Map {
-            default_terrain: models::Terrain::Grass,
-            specified_terrain: vec![
-                ((3, 3), models::Terrain::Dirt),
-                ((3, 4), models::Terrain::Rock),
-            ]
-            .into_iter()
-            .collect::<BTreeMap<_, _>>(),
-            characters: vec![
-                ((4, 3), models::Character::Knight),
-                ((5, 5), models::Character::Mage),
-                ((1, 8), models::Character::Thief),
-            ]
-            .into_iter()
-            .collect::<BTreeMap<_, _>>(),
-            hint_max_x: 17,
-            hint_max_y: 17,
+        models::Display {
+            map: models::Map {
+                default_terrain: models::Terrain::Grass,
+                specified_terrain: vec![
+                    ((3, 3), models::Terrain::Dirt),
+                    ((3, 4), models::Terrain::Rock),
+                ]
+                .into_iter()
+                .collect::<BTreeMap<_, _>>(),
+                characters: vec![
+                    ((4, 3), models::Character::Knight),
+                    ((5, 5), models::Character::Mage),
+                    ((1, 8), models::Character::Thief),
+                ]
+                .into_iter()
+                .collect::<BTreeMap<_, _>>(),
+                hint_max_x: 17,
+                hint_max_y: 17,
+            },
+            current_selection: (4, 5),
         }
         .into_html(),
     ])

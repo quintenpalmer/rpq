@@ -30,3 +30,8 @@ impl Map {
         )
     }
 }
+
+pub struct Display {
+    pub map: Map,
+    pub current_selection: (u32, u32),
+}
