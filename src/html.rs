@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use htmldsl::attributes;
 use htmldsl::elements;
+use htmldsl::style_sheet;
 use htmldsl::styles;
 use htmldsl::units;
 use htmldsl::TagRenderableStyleSetter;
@@ -22,7 +23,48 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
                 }),
                 styles: attributes::StyleAttr::empty(),
             }],
-            styles: Vec::new(),
+            styles: vec![elements::Style {
+                style_sheet: style_sheet::StyleSheet {
+                    assignments: vec![
+                        style_sheet::StyleAssignment {
+                            names: vec![
+                                "html", "body", "span", "div", "h1", "h2", "h3", "h4", "h5", "h6",
+                                "p", "pre", "a", "code", "img", "b", "u", "i", "ul", "ol", "li",
+                                "table", "tbody", "thead", "tfoot", "tr", "th", "td",
+                            ]
+                            .into_iter()
+                            .map(|x| x.to_string())
+                            .collect(),
+                            styles: vec![
+                                &styles::Border {
+                                    style: units::BorderStyle::None,
+                                },
+                                &styles::Margin::AllFour(units::NumberOrAuto::Number(
+                                    units::Number::Length(0, units::Length::Pixel),
+                                )),
+                                &styles::Padding::AllFour(units::Number::Length(
+                                    0,
+                                    units::Length::Pixel,
+                                )),
+                                &styles::VerticalAlign {
+                                    value: units::VerticalAlignValue::Baseline,
+                                },
+                            ],
+                        },
+                        style_sheet::StyleAssignment {
+                            names: vec!["table".into()],
+                            styles: vec![
+                                &styles::BorderCollapse {
+                                    value: units::BorderCollapseStyle::Collapse,
+                                },
+                                &styles::BorderSpacing {
+                                    value: units::Number::Length(0, units::Length::Pixel),
+                                },
+                            ],
+                        },
+                    ],
+                },
+            }],
         }),
         body: Some(body),
     };
