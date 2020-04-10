@@ -90,20 +90,42 @@ impl models::Terrain {
     }
 }
 
+impl models::Character {
+    fn into_html(&self) -> htmldsl::Element {
+        htmldsl::tag(Box::new(
+            elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
+                .add_style(vec![&styles::Display::Block, &styles::Position::Absolute]),
+        ))
+    }
+
+    fn image_name(&self) -> String {
+        match self {
+            models::Character::Knight => "knight",
+            models::Character::Mage => "mage",
+            models::Character::Thief => "thief",
+        }
+        .into()
+    }
+}
+
 impl models::Map {
     fn into_html(&self) -> htmldsl::Element {
         let (max_x, max_y) = self.maxes();
-        let mut empty_rendered_map: Vec<Vec<models::Terrain>> = (0..max_x)
+        let mut empty_rendered_map: Vec<Vec<(models::Terrain, Option<models::Character>)>> = (0
+            ..max_x)
             .into_iter()
             .map(|_| {
                 (0..max_y)
                     .into_iter()
-                    .map(|_| self.default_terrain.clone())
+                    .map(|_| (self.default_terrain.clone(), None))
                     .collect()
             })
             .collect();
         for ((x, y), terrain) in self.specified_terrain.iter() {
-            empty_rendered_map[*x as usize][*y as usize] = terrain.clone();
+            empty_rendered_map[*x as usize][*y as usize].0 = terrain.clone();
+        }
+        for ((x, y), character) in self.characters.iter() {
+            empty_rendered_map[*x as usize][*y as usize].1 = Some(character.clone());
         }
 
         htmldsl::tag(Box::new(elements::Table::style_less(
@@ -114,13 +136,28 @@ impl models::Map {
                     .map(|row| {
                         elements::Tr::style_less(
                             row.into_iter()
-                                .map(|data| elements::Td::style_less(vec![data.into_html()]))
+                                .map(|data| {
+                                    elements::Td::style_less(maybe_append(
+                                        vec![data.0.into_html()],
+                                        data.1.map(|x| x.into_html()),
+                                    ))
+                                })
                                 .collect(),
                         )
                     })
                     .collect(),
             ),
         )))
+    }
+}
+
+fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
+    match maybe {
+        Some(v) => {
+            vec.push(v);
+            vec
+        }
+        None => vec,
     }
 }
 
@@ -137,6 +174,9 @@ pub fn index<'a>() -> elements::Body<'a> {
             ]
             .into_iter()
             .collect::<BTreeMap<_, _>>(),
+            characters: vec![((4, 3), models::Character::Knight)]
+                .into_iter()
+                .collect::<BTreeMap<_, _>>(),
             hint_max_x: 17,
             hint_max_y: 17,
         }
