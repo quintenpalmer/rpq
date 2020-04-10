@@ -21,12 +21,19 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         req.method()
     );
     match (req.method(), path_frags.as_slice()) {
+        // Serve some instructions at /
+        (&Method::GET, []) => index_response(),
+
         // Serve hard-coded images
         (&Method::GET, ["images", name]) => serve_image(name),
 
         // Return the 404 Not Found for other routes.
         _ => not_found_response(),
     }
+}
+
+fn index_response() -> Result<Response<Body>, hyper::Error> {
+    Ok(Response::new(Body::from(html::index())))
 }
 
 fn not_found_response() -> Result<Response<Body>, hyper::Error> {

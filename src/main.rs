@@ -1,5 +1,6 @@
 mod html;
 mod http;
+mod models;
 
 use hyper::service::{make_service_fn, service_fn};
 use hyper::Server;
