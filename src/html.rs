@@ -174,9 +174,13 @@ pub fn index<'a>() -> elements::Body<'a> {
             ]
             .into_iter()
             .collect::<BTreeMap<_, _>>(),
-            characters: vec![((4, 3), models::Character::Knight)]
-                .into_iter()
-                .collect::<BTreeMap<_, _>>(),
+            characters: vec![
+                ((4, 3), models::Character::Knight),
+                ((5, 5), models::Character::Mage),
+                ((1, 8), models::Character::Thief),
+            ]
+            .into_iter()
+            .collect::<BTreeMap<_, _>>(),
             hint_max_x: 17,
             hint_max_y: 17,
         }
