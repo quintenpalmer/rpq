@@ -1,4 +1,6 @@
-use hyper::{Body, Request, Response, StatusCode};
+use hyper::{Body, Method, Request, Response, StatusCode};
+use std::fs::File;
+use std::io::{ErrorKind, Read};
 
 use super::html;
 
@@ -19,6 +21,9 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         req.method()
     );
     match (req.method(), path_frags.as_slice()) {
+        // Serve hard-coded images
+        (&Method::GET, ["images", name]) => serve_image(name),
+
         // Return the 404 Not Found for other routes.
         _ => not_found_response(),
     }
@@ -41,4 +46,66 @@ fn bad_request_response<T: Into<String>>(message: T) -> Result<Response<Body>, h
     let mut not_found = Response::new(Body::from(html::bad_request(message)));
     *not_found.status_mut() = StatusCode::BAD_REQUEST;
     Ok(not_found)
+}
+
+pub enum ImageFileType {
+    PNG,
+}
+
+impl ImageFileType {
+    pub fn extension(&self) -> &'static str {
+        match self {
+            ImageFileType::PNG => "png",
+        }
+    }
+}
+
+fn serve_image(file_name: &str) -> Result<Response<Body>, hyper::Error> {
+    let (name, suffix) = match file_name.split('.').collect::<Vec<&str>>().as_slice() {
+        &[name, suffix] => (name, suffix),
+        _ => return bad_request_response("images must be 'file.ext'"),
+    };
+
+    let ext = match suffix {
+        "png" => ImageFileType::PNG,
+        _ => return bad_request_response("only .png image file type is supported"),
+    };
+
+    match validate_file_name(name) {
+        Ok(()) => (),
+        Err(e) => return bad_request_response(format!("image file invalid: {}", e)),
+    };
+    serve_file(format!("images/{}.{}", name, ext.extension()))
+}
+
+fn validate_file_name(name: &str) -> Result<(), &'static str> {
+    for c in name.chars() {
+        if !is_alpha_numeric_underscore(c) {
+            return Err("must contain only ascii alphanumeric and '_' characters");
+        }
+    }
+    return Ok(());
+}
+
+fn is_alpha_numeric_underscore(c: char) -> bool {
+    return c.is_ascii_alphanumeric() || c == '_';
+}
+
+pub fn serve_file(path: String) -> Result<Response<Body>, hyper::Error> {
+    let mut f = match File::open(path) {
+        Ok(file) => file,
+        Err(e) => match e.kind() {
+            ErrorKind::NotFound => return not_found_response(),
+            _ => return internal_server_error(format!("file open failed: {:?}", e)),
+        },
+    };
+
+    let mut source = Vec::new();
+
+    match f.read_to_end(&mut source) {
+        Ok(_) => (),
+        Err(e) => return internal_server_error(format!("file read to end failed: {:?}", e)),
+    };
+
+    Ok(Response::new(Body::from(source)))
 }
