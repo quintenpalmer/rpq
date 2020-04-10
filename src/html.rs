@@ -230,6 +230,50 @@ pub fn index<'a>() -> elements::Body<'a> {
             current_selection: (4, 5),
         }
         .into_html(),
+        htmldsl::tag(Box::new(elements::Form {
+            formmethod: attributes::Formmethod {
+                inner: units::FormmethodValue::Post,
+            },
+            action: Some(attributes::Action {
+                value: units::SourceValue::new("/cursor/left".to_string()),
+            }),
+            inputs: Vec::new(),
+            button: elements::Button::style_less(htmldsl::text("<".into())),
+            styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+        })),
+        htmldsl::tag(Box::new(elements::Form {
+            formmethod: attributes::Formmethod {
+                inner: units::FormmethodValue::Post,
+            },
+            action: Some(attributes::Action {
+                value: units::SourceValue::new("/cursor/up".to_string()),
+            }),
+            inputs: Vec::new(),
+            button: elements::Button::style_less(htmldsl::text("^".into())),
+            styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+        })),
+        htmldsl::tag(Box::new(elements::Form {
+            formmethod: attributes::Formmethod {
+                inner: units::FormmethodValue::Post,
+            },
+            action: Some(attributes::Action {
+                value: units::SourceValue::new("/cursor/down".to_string()),
+            }),
+            inputs: Vec::new(),
+            button: elements::Button::style_less(htmldsl::text("v".into())),
+            styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+        })),
+        htmldsl::tag(Box::new(elements::Form {
+            formmethod: attributes::Formmethod {
+                inner: units::FormmethodValue::Post,
+            },
+            action: Some(attributes::Action {
+                value: units::SourceValue::new("/cursor/right".to_string()),
+            }),
+            inputs: Vec::new(),
+            button: elements::Button::style_less(htmldsl::text(">".into())),
+            styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+        })),
     ])
 }
 

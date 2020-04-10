@@ -1,5 +1,25 @@
 use std::collections::BTreeMap;
 
+#[derive(Debug)]
+pub enum Direction {
+    Right,
+    Up,
+    Left,
+    Down,
+}
+
+impl Direction {
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "right" => Some(Direction::Right),
+            "up" => Some(Direction::Up),
+            "left" => Some(Direction::Left),
+            "down" => Some(Direction::Down),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Clone)]
 pub enum Terrain {
     Grass,

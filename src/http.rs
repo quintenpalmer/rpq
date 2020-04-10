@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::{ErrorKind, Read};
 
 use super::html;
+use super::models;
 
 /// This is our service handler. It receives a Request, routes on its
 /// path, and returns a Future of a Response.
@@ -24,6 +25,8 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Serve some instructions at /
         (&Method::GET, []) => index_response(),
 
+        (&Method::POST, ["cursor", direction]) => move_cursor(direction),
+
         // Serve hard-coded images
         (&Method::GET, ["images", name]) => serve_image(name),
 
@@ -33,6 +36,15 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 }
 
 fn index_response() -> Result<Response<Body>, hyper::Error> {
+    Ok(Response::new(Body::from(html::render_page(html::index()))))
+}
+
+fn move_cursor(direction_str: &str) -> Result<Response<Body>, hyper::Error> {
+    let direction = match models::Direction::parse(direction_str) {
+        Some(d) => d,
+        None => return bad_request_response("direction must be one of right, up, left, down"),
+    };
+    println!("direction: {:?}", direction);
     Ok(Response::new(Body::from(html::render_page(html::index()))))
 }
 
