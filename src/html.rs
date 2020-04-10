@@ -2,7 +2,9 @@ use std::collections::BTreeMap;
 
 use htmldsl::attributes;
 use htmldsl::elements;
+use htmldsl::styles;
 use htmldsl::units;
+use htmldsl::TagRenderableStyleSetter;
 
 use super::models;
 
@@ -30,9 +32,10 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
 
 impl models::Terrain {
     fn into_html(&self) -> htmldsl::Element {
-        htmldsl::tag(Box::new(elements::Img::style_less(attributes::Src {
-            value: units::SourceValue::new(format!("/images/{}.png", self.image_name())),
-        })))
+        htmldsl::tag(Box::new(
+            elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
+                .add_style(vec![&styles::Display::Block]),
+        ))
     }
 
     fn image_name(&self) -> String {
