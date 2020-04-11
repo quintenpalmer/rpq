@@ -26,6 +26,7 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Serve some instructions at /
         (&Method::GET, []) => index_response(),
 
+        (&Method::GET, ["displays"]) => displays_response(),
         (&Method::GET, ["displays", display_id]) => display_response(display_id),
 
         (&Method::POST, ["displays", display_id, "cursor", direction]) => {
@@ -41,15 +42,19 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 }
 
 fn index_response() -> Result<Response<Body>, hyper::Error> {
+    Ok(Response::new(Body::from(html::render_page(html::index()))))
+}
+
+fn displays_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
     let displays = match db.get_displays() {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(html::index(
-        displays,
-    )))))
+    Ok(Response::new(Body::from(html::render_page(
+        html::displays(displays),
+    ))))
 }
 
 fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error> {

@@ -249,7 +249,17 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
     }
 }
 
-pub fn index<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
+pub fn index<'a>() -> elements::Body<'a> {
+    elements::Body::style_less(vec![elements::A::style_less(
+        attributes::Href {
+            value: units::SourceValue::new("/displays".into()),
+        },
+        vec![htmldsl::text("displays".into())],
+    )
+    .into_element()])
+}
+
+pub fn displays<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
     elements::Body::style_less(
         displays
             .into_iter()
