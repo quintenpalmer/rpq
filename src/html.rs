@@ -104,10 +104,7 @@ impl models::Terrain {
 
 impl models::Character {
     fn into_html<'a>(self) -> elements::Img<'a> {
-        absolute_hover(elements::Img::style_less_with_src(format!(
-            "/images/{}.png",
-            self.image_name()
-        )))
+        elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
     }
 
     fn image_name(&self) -> String {
@@ -161,7 +158,9 @@ impl models::Map {
                                                     .into_html()
                                                     .add_style(vec![&styles::Display::Block])
                                                     .into_element()],
-                                                data.1.map(|x| x.into_html().into_element()),
+                                                data.1.map(|x| {
+                                                    absolute_hover(x.into_html()).into_element()
+                                                }),
                                             ),
                                             if data.2 {
                                                 Some(
