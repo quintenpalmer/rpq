@@ -52,44 +52,48 @@ impl DB {
             Some(v) => v,
             None => return Err("could not find a display db entry".to_string()),
         };
-        Ok(models::Display {
-            map: models::Map {
-                default_terrain: models::Terrain::Grass,
-                specified_terrain: (0..12)
-                    .into_iter()
-                    .map(|i| ((9, i), models::Terrain::Dirt))
-                    .chain(
-                        (0..12)
-                            .into_iter()
-                            .map(|i| ((10, i), models::Terrain::Dirt)),
-                    )
-                    .chain(
-                        (0..12)
-                            .into_iter()
-                            .map(|i| ((i, 10), models::Terrain::Dirt)),
-                    )
-                    .chain(
-                        (0..12)
-                            .into_iter()
-                            .map(|i| ((11, i), models::Terrain::Rock)),
-                    )
-                    .chain(
-                        (0..12)
-                            .into_iter()
-                            .map(|i| ((i, 11), models::Terrain::Rock)),
-                    )
-                    .collect::<BTreeMap<_, _>>(),
-                characters: vec![
-                    ((4, 3), models::Character::Knight),
-                    ((5, 5), models::Character::Mage),
-                    ((1, 8), models::Character::Thief),
-                ]
+        Ok(display_model_from_db(cursor))
+    }
+}
+
+fn display_model_from_db(d: DBDisplay) -> models::Display {
+    models::Display {
+        map: models::Map {
+            default_terrain: models::Terrain::Grass,
+            specified_terrain: (0..12)
                 .into_iter()
+                .map(|i| ((9, i), models::Terrain::Dirt))
+                .chain(
+                    (0..12)
+                        .into_iter()
+                        .map(|i| ((10, i), models::Terrain::Dirt)),
+                )
+                .chain(
+                    (0..12)
+                        .into_iter()
+                        .map(|i| ((i, 10), models::Terrain::Dirt)),
+                )
+                .chain(
+                    (0..12)
+                        .into_iter()
+                        .map(|i| ((11, i), models::Terrain::Rock)),
+                )
+                .chain(
+                    (0..12)
+                        .into_iter()
+                        .map(|i| ((i, 11), models::Terrain::Rock)),
+                )
                 .collect::<BTreeMap<_, _>>(),
-                hint_max_x: 12,
-                hint_max_y: 12,
-            },
-            current_selection: (cursor.cursor_x, cursor.cursor_y),
-        })
+            characters: vec![
+                ((4, 3), models::Character::Knight),
+                ((5, 5), models::Character::Mage),
+                ((1, 8), models::Character::Thief),
+            ]
+            .into_iter()
+            .collect::<BTreeMap<_, _>>(),
+            hint_max_x: 12,
+            hint_max_y: 12,
+        },
+        current_selection: (d.cursor_x, d.cursor_y),
     }
 }
