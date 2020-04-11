@@ -73,6 +73,37 @@ impl DB {
         Ok(records)
     }
 
+    pub fn update_display_cursor(&self, id: u32, cursor: (u32, u32)) -> Result<(), String> {
+        let records = self
+            .read_db_displays()?
+            .into_iter()
+            .map(|mut record| {
+                if record.id == id {
+                    record.cursor_x = cursor.0;
+                    record.cursor_y = cursor.1;
+                    record
+                } else {
+                    record
+                }
+            })
+            .collect();
+        self.write_db_displays(records)
+    }
+
+    pub fn write_db_displays(&self, records: Vec<DBDisplay>) -> Result<(), String> {
+        let mut writer = csv::Writer::from_path(DISPLAY_DB_FILE_NAME).unwrap();
+
+        for record in records.into_iter() {
+            writer.serialize(record).unwrap();
+        }
+        match writer.flush() {
+            Ok(()) => (),
+            Err(e) => return Err(format!("error flushing: {:?}", e)),
+        };
+
+        Ok(())
+    }
+
     pub fn write_display(&self, display: &models::Display) -> Result<(), String> {
         let records = vec![DBDisplay {
             id: display.id,

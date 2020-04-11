@@ -90,7 +90,7 @@ fn move_cursor(display_id_str: &str, direction_str: &str) -> Result<Response<Bod
 
     display.move_cursor(direction);
 
-    match db.write_display(&display) {
+    match db.update_display_cursor(display.id, display.current_selection) {
         Ok(()) => (),
         Err(e) => return internal_server_error(e),
     };
