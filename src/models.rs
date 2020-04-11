@@ -18,6 +18,15 @@ impl Direction {
             _ => None,
         }
     }
+
+    pub fn form_strings(&self) -> (&str, &str) {
+        match self {
+            Direction::Right => ("right", ">"),
+            Direction::Up => ("up", "^"),
+            Direction::Left => ("left", "<"),
+            Direction::Down => ("down", "v"),
+        }
+    }
 }
 
 #[derive(Clone)]
