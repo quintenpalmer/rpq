@@ -91,10 +91,9 @@ fn absolute_hover<'a, T: TagRenderableStyleSetter<'a>>(element: T) -> T {
 }
 
 impl models::Terrain {
-    fn into_html(self) -> htmldsl::Element {
+    fn into_html<'a>(self) -> elements::Img<'a> {
         elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
             .add_style(vec![&styles::Display::Block])
-            .into_element()
     }
 
     fn image_name(&self) -> String {
@@ -162,7 +161,7 @@ impl models::Map {
                                     elements::Td::style_less(vec![elements::Div::style_less(
                                         maybe_append(
                                             maybe_append(
-                                                vec![data.0.into_html()],
+                                                vec![data.0.into_html().into_element()],
                                                 data.1.map(|x| x.into_html()),
                                             ),
                                             if data.2 {
@@ -194,7 +193,7 @@ impl models::Display {
             elements::P::style_less(vec![
                 htmldsl::text("Terrain: ".into()),
                 htmldsl::text(terrain.display_string()),
-                terrain.into_html(),
+                terrain.into_html().into_element(),
             ])
             .into_element(),
             elements::P::style_less(vec![
