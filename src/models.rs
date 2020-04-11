@@ -44,8 +44,11 @@ pub struct Map {
 
 impl Map {
     pub fn maxes(&self) -> (u32, u32) {
-        self.specified_terrain.keys().fold(
-            (self.hint_max_x, self.hint_max_y),
+        self.characters.keys().fold(
+            self.specified_terrain.keys().fold(
+                (self.hint_max_x, self.hint_max_y),
+                |(acc_x, acc_y), (x, y)| (std::cmp::max(acc_x, *x), std::cmp::max(acc_y, *y)),
+            ),
             |(acc_x, acc_y), (x, y)| (std::cmp::max(acc_x, *x), std::cmp::max(acc_y, *y)),
         )
     }
