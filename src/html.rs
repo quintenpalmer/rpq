@@ -70,11 +70,10 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
     htmldsl::render_simple_html_page(true, html)
 }
 
-fn current_selection_marker() -> htmldsl::Element {
+fn current_selection_marker<'a>() -> elements::Img<'a> {
     absolute_hover(elements::Img::style_less_with_src(
         "/images/marker.png".to_string(),
     ))
-    .into_element()
 }
 
 fn absolute_hover<'a, T: TagRenderableStyleSetter<'a>>(element: T) -> T {
@@ -164,7 +163,7 @@ impl models::Map {
                                                 data.1.map(|x| x.into_html().into_element()),
                                             ),
                                             if data.2 {
-                                                Some(current_selection_marker())
+                                                Some(current_selection_marker().into_element())
                                             } else {
                                                 None
                                             },
@@ -201,7 +200,9 @@ impl models::Display {
                     Some(ref v) => v.display_string(),
                     None => "--".into(),
                 }),
-                o_character.map_or(current_selection_marker(), |x| x.into_html().into_element()),
+                o_character.map_or(current_selection_marker().into_element(), |x| {
+                    x.into_html().into_element()
+                }),
             ])
             .into_element(),
         ])
