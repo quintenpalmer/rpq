@@ -250,16 +250,7 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
 }
 
 pub fn index<'a>() -> elements::Body<'a> {
-    elements::Body::style_less(vec![
-        index_link(),
-        elements::A::style_less(
-            attributes::Href {
-                value: units::SourceValue::new("/displays".into()),
-            },
-            vec![htmldsl::text("displays".into())],
-        )
-        .into_element(),
-    ])
+    elements::Body::style_less(vec![index_link(), displays_link()])
 }
 
 pub fn displays<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
@@ -343,6 +334,16 @@ fn index_link() -> htmldsl::Element {
         vec![htmldsl::text("home".into())],
     )
     .into_element()])
+    .into_element()
+}
+
+fn displays_link() -> htmldsl::Element {
+    elements::A::style_less(
+        attributes::Href {
+            value: units::SourceValue::new("/displays".into()),
+        },
+        vec![htmldsl::text("displays".into())],
+    )
     .into_element()
 }
 
