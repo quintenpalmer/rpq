@@ -3,7 +3,7 @@ use htmldsl::elements;
 use htmldsl::style_sheet;
 use htmldsl::styles;
 use htmldsl::units;
-use htmldsl::TagRenderableStyleSetter;
+use htmldsl::{TagRenderableIntoElement, TagRenderableStyleSetter};
 
 use super::models;
 
@@ -71,8 +71,8 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
 }
 
 fn current_selection_marker() -> htmldsl::Element {
-    htmldsl::tag(Box::new(
-        elements::Img::style_less_with_src("/images/marker.png".to_string()).add_style(vec![
+    elements::Img::style_less_with_src("/images/marker.png".to_string())
+        .add_style(vec![
             &styles::Display::Block,
             &styles::Position::Absolute,
             &styles::Top {
@@ -81,16 +81,15 @@ fn current_selection_marker() -> htmldsl::Element {
             &styles::Left {
                 value: units::Number::Length(0, units::Length::Pixel),
             },
-        ]),
-    ))
+        ])
+        .into_element()
 }
 
 impl models::Terrain {
     fn into_html(&self) -> htmldsl::Element {
-        htmldsl::tag(Box::new(
-            elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
-                .add_style(vec![&styles::Display::Block]),
-        ))
+        elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
+            .add_style(vec![&styles::Display::Block])
+            .into_element()
     }
 
     fn image_name(&self) -> String {
@@ -105,19 +104,18 @@ impl models::Terrain {
 
 impl models::Character {
     fn into_html(&self) -> htmldsl::Element {
-        htmldsl::tag(Box::new(
-            elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
-                .add_style(vec![
-                    &styles::Display::Block,
-                    &styles::Position::Absolute,
-                    &styles::Top {
-                        value: units::Number::Length(0, units::Length::Pixel),
-                    },
-                    &styles::Left {
-                        value: units::Number::Length(0, units::Length::Pixel),
-                    },
-                ]),
-        ))
+        elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
+            .add_style(vec![
+                &styles::Display::Block,
+                &styles::Position::Absolute,
+                &styles::Top {
+                    value: units::Number::Length(0, units::Length::Pixel),
+                },
+                &styles::Left {
+                    value: units::Number::Length(0, units::Length::Pixel),
+                },
+            ])
+            .into_element()
     }
 
     fn image_name(&self) -> String {
@@ -154,7 +152,7 @@ impl models::Map {
             None => (),
         };
 
-        htmldsl::tag(Box::new(elements::Table::style_less(
+        elements::Table::style_less(
             None,
             elements::Tbody::style_less(
                 empty_rendered_map
@@ -163,8 +161,8 @@ impl models::Map {
                         elements::Tr::style_less(
                             row.into_iter()
                                 .map(|data| {
-                                    elements::Td::style_less(vec![htmldsl::tag(Box::new(
-                                        elements::Div::style_less(maybe_append(
+                                    elements::Td::style_less(vec![elements::Div::style_less(
+                                        maybe_append(
                                             maybe_append(
                                                 vec![data.0.into_html()],
                                                 data.1.map(|x| x.into_html()),
@@ -174,16 +172,18 @@ impl models::Map {
                                             } else {
                                                 None
                                             },
-                                        ))
-                                        .add_style(vec![&styles::Position::Relative]),
-                                    ))])
+                                        ),
+                                    )
+                                    .add_style(vec![&styles::Position::Relative])
+                                    .into_element()])
                                 })
                                 .collect(),
                         )
                     })
                     .collect(),
             ),
-        )))
+        )
+        .into_element()
     }
 }
 
@@ -205,16 +205,16 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
 
 pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        htmldsl::tag(Box::new(elements::H1::style_less(vec![htmldsl::tag(
-            Box::new(elements::A::style_less(
-                attributes::Href {
-                    value: units::SourceValue::new("/".into()),
-                },
-                vec![htmldsl::text("the map".into())],
-            )),
-        )]))),
+        elements::H1::style_less(vec![elements::A::style_less(
+            attributes::Href {
+                value: units::SourceValue::new("/".into()),
+            },
+            vec![htmldsl::text("the map".into())],
+        )
+        .into_element()])
+        .into_element(),
         display.into_html(),
-        htmldsl::tag(Box::new(elements::Form {
+        elements::Form {
             formmethod: attributes::Formmethod {
                 inner: units::FormmethodValue::Post,
             },
@@ -224,8 +224,9 @@ pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
             inputs: Vec::new(),
             button: elements::Button::style_less(htmldsl::text("<".into())),
             styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
-        })),
-        htmldsl::tag(Box::new(elements::Form {
+        }
+        .into_element(),
+        elements::Form {
             formmethod: attributes::Formmethod {
                 inner: units::FormmethodValue::Post,
             },
@@ -235,8 +236,9 @@ pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
             inputs: Vec::new(),
             button: elements::Button::style_less(htmldsl::text("^".into())),
             styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
-        })),
-        htmldsl::tag(Box::new(elements::Form {
+        }
+        .into_element(),
+        elements::Form {
             formmethod: attributes::Formmethod {
                 inner: units::FormmethodValue::Post,
             },
@@ -246,8 +248,9 @@ pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
             inputs: Vec::new(),
             button: elements::Button::style_less(htmldsl::text("v".into())),
             styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
-        })),
-        htmldsl::tag(Box::new(elements::Form {
+        }
+        .into_element(),
+        elements::Form {
             formmethod: attributes::Formmethod {
                 inner: units::FormmethodValue::Post,
             },
@@ -257,29 +260,28 @@ pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
             inputs: Vec::new(),
             button: elements::Button::style_less(htmldsl::text(">".into())),
             styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
-        })),
+        }
+        .into_element(),
     ])
 }
 
 pub fn not_found<'a>() -> elements::Body<'a> {
-    elements::Body::style_less(vec![htmldsl::tag(Box::new(elements::H1::style_less(
-        vec![htmldsl::text("not found".into())],
-    )))])
+    elements::Body::style_less(vec![elements::H1::style_less(vec![htmldsl::text(
+        "not found".into(),
+    )])
+    .into_element()])
 }
 
 pub fn internal_server_error<'a>() -> elements::Body<'a> {
-    elements::Body::style_less(vec![htmldsl::tag(Box::new(elements::H1::style_less(
-        vec![htmldsl::text("internal server error".into())],
-    )))])
+    elements::Body::style_less(vec![elements::H1::style_less(vec![htmldsl::text(
+        "internal server error".into(),
+    )])
+    .into_element()])
 }
 
 pub fn bad_request<'a, T: Into<String>>(message: T) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        htmldsl::tag(Box::new(elements::H1::style_less(vec![htmldsl::text(
-            "bad request".into(),
-        )]))),
-        htmldsl::tag(Box::new(elements::P::style_less(vec![htmldsl::text(
-            message.into(),
-        )]))),
+        elements::H1::style_less(vec![htmldsl::text("bad request".into())]).into_element(),
+        elements::P::style_less(vec![htmldsl::text(message.into())]).into_element(),
     ])
 }
