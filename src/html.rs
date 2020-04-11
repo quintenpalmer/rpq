@@ -192,19 +192,21 @@ impl models::Display {
 
         let hover_info = elements::Div::style_less(vec![
             elements::P::style_less(vec![
+                terrain.clone().into_html().into_element(),
                 htmldsl::text("Terrain: ".into()),
                 htmldsl::text(terrain.display_string()),
-                terrain.into_html().into_element(),
             ])
             .into_element(),
             elements::P::style_less(vec![
+                o_character
+                    .clone()
+                    .map_or(current_selection_marker().into_element(), |x| {
+                        x.into_html().into_element()
+                    }),
                 htmldsl::text("Character: ".into()),
                 htmldsl::text(match o_character {
-                    Some(ref v) => v.display_string(),
+                    Some(v) => v.display_string(),
                     None => "--".into(),
-                }),
-                o_character.map_or(current_selection_marker().into_element(), |x| {
-                    x.into_html().into_element()
                 }),
             ])
             .into_element(),
