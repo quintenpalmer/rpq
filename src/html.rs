@@ -339,12 +339,13 @@ fn index_link() -> htmldsl::Element {
 }
 
 fn displays_link() -> htmldsl::Element {
-    elements::A::style_less(
+    elements::H2::style_less(vec![elements::A::style_less(
         attributes::Href {
             value: units::SourceValue::new("/displays".into()),
         },
         vec![htmldsl::text("displays".into())],
     )
+    .into_element()])
     .into_element()
 }
 
