@@ -45,14 +45,9 @@ impl DB {
     }
 
     pub fn get_display(&self, display_id: u32) -> Result<models::Display, String> {
-        let mut rdr = csv::Reader::from_reader(
-            File::open(DISPLAY_DB_FILE_NAME)
-                .map_err(|e| format!("could not read from file: {:?}", e))?,
-        );
-        for result in rdr.deserialize() {
-            let record: DBDisplay = result.unwrap();
-            if record.id == display_id {
-                return Ok(display_model_from_db(record));
+        for display in self.get_displays()?.into_iter() {
+            if display.id == display_id {
+                return Ok(display);
             }
         }
         return Err("could not find display with supplied id".into());
