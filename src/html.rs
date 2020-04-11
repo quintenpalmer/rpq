@@ -260,21 +260,21 @@ pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
         .into_element()])
         .into_element(),
         display.into_html(),
-        cursor_form_button(models::Direction::Left),
-        cursor_form_button(models::Direction::Up),
-        cursor_form_button(models::Direction::Down),
-        cursor_form_button(models::Direction::Right),
+        cursor_form_button(display.id, models::Direction::Left),
+        cursor_form_button(display.id, models::Direction::Up),
+        cursor_form_button(display.id, models::Direction::Down),
+        cursor_form_button(display.id, models::Direction::Right),
     ])
 }
 
-fn cursor_form_button(dir: models::Direction) -> htmldsl::Element {
+fn cursor_form_button(display_id: u32, dir: models::Direction) -> htmldsl::Element {
     let (url_frag, symbol) = dir.form_strings();
     elements::Form {
         formmethod: attributes::Formmethod {
             inner: units::FormmethodValue::Post,
         },
         action: Some(attributes::Action {
-            value: units::SourceValue::new(format!("/cursor/{}", url_frag)),
+            value: units::SourceValue::new(format!("/displays/{}/cursor/{}", display_id, url_frag)),
         }),
         inputs: Vec::new(),
         button: elements::Button::style_less(htmldsl::text(symbol.into())),
