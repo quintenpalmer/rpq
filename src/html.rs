@@ -299,7 +299,7 @@ pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
             attributes::Href {
                 value: units::SourceValue::new(format!("/displays/{}", display.id)),
             },
-            vec![htmldsl::text("the map".into())],
+            vec![htmldsl::text("this map".into())],
         )
         .into_element()])
         .into_element(),
