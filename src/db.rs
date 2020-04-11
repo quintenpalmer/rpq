@@ -107,8 +107,8 @@ fn display_model_from_db(d: DBDisplay) -> models::Display {
             ]
             .into_iter()
             .collect::<BTreeMap<_, _>>(),
-            hint_max_x: 15,
-            hint_max_y: 12,
+            hint_max_x: 12,
+            hint_max_y: 15,
         },
         current_selection: (d.cursor_x, d.cursor_y),
     }
