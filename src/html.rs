@@ -91,7 +91,7 @@ fn absolute_hover<'a, T: TagRenderableStyleSetter<'a>>(element: T) -> T {
 }
 
 impl models::Terrain {
-    fn into_html(&self) -> htmldsl::Element {
+    fn into_html(self) -> htmldsl::Element {
         elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
             .add_style(vec![&styles::Display::Block])
             .into_element()
@@ -108,7 +108,7 @@ impl models::Terrain {
 }
 
 impl models::Character {
-    fn into_html(&self) -> htmldsl::Element {
+    fn into_html(self) -> htmldsl::Element {
         absolute_hover(elements::Img::style_less_with_src(format!(
             "/images/{}.png",
             self.image_name()
@@ -127,7 +127,7 @@ impl models::Character {
 }
 
 impl models::Map {
-    fn into_html(&self, current_selection: Option<(u32, u32)>) -> htmldsl::Element {
+    fn into_html(self, current_selection: Option<(u32, u32)>) -> htmldsl::Element {
         let (max_x, max_y) = self.maxes();
         let mut empty_rendered_map: Vec<Vec<(models::Terrain, Option<models::Character>, bool)>> =
             (0..max_y)
@@ -187,7 +187,7 @@ impl models::Map {
 }
 
 impl models::Display {
-    fn into_html(&self) -> htmldsl::Element {
+    fn into_html(self) -> htmldsl::Element {
         let at_info = self.map.at(&self.current_selection);
 
         let hover_info = elements::Div::style_less(vec![
