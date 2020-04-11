@@ -45,6 +45,15 @@ impl Terrain {
 }
 
 impl Terrain {
+    pub fn url_frag_string(&self) -> String {
+        match self {
+            Terrain::Grass => "grass",
+            Terrain::Dirt => "dirt",
+            Terrain::Rock => "rock",
+        }
+        .into()
+    }
+
     pub fn display_string(&self) -> String {
         match self {
             Terrain::Grass => "Grass",
@@ -69,6 +78,15 @@ impl Character {
 }
 
 impl Character {
+    pub fn url_frag_string(&self) -> String {
+        match self {
+            Character::Knight => "knight",
+            Character::Mage => "mage",
+            Character::Thief => "thief",
+        }
+        .into()
+    }
+
     pub fn display_string(&self) -> String {
         match self {
             Character::Knight => "Knight",

@@ -30,6 +30,12 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         (&Method::POST, ["displays"]) => displays_create_response(),
         (&Method::GET, ["displays", display_id]) => display_response(display_id),
         (&Method::GET, ["displays", display_id, "edit"]) => edit_display_response(display_id),
+        (&Method::POST, ["displays", display_id, "edit", "character", character_str]) => {
+            edit_display_set_value(display_id, TerrainOrCharacter::Character, character_str)
+        }
+        (&Method::POST, ["displays", display_id, "edit", "terrain", terrain_str]) => {
+            edit_display_set_value(display_id, TerrainOrCharacter::Terrain, terrain_str)
+        }
 
         (&Method::POST, ["displays", display_id, "cursor", direction]) => {
             move_cursor(display_id, direction)
@@ -41,6 +47,11 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Return the 404 Not Found for other routes.
         _ => not_found_response(),
     }
+}
+
+enum TerrainOrCharacter {
+    Terrain,
+    Character,
 }
 
 fn index_response() -> Result<Response<Body>, hyper::Error> {
@@ -103,6 +114,16 @@ fn edit_display_response(display_id_str: &str) -> Result<Response<Body>, hyper::
     Ok(Response::new(Body::from(html::render_page(
         html::edit_display(display),
     ))))
+}
+
+fn edit_display_set_value(
+    display_id_str: &str,
+    value_type: TerrainOrCharacter,
+    value_value: &str,
+) -> Result<Response<Body>, hyper::Error> {
+    let db = db::DB::new();
+
+    edit_display_response(display_id_str)
 }
 
 fn move_cursor(display_id_str: &str, direction_str: &str) -> Result<Response<Body>, hyper::Error> {

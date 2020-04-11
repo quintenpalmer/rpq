@@ -198,7 +198,7 @@ impl models::Display {
                     htmldsl::text(terrain.display_string()),
                 ],
                 if edit {
-                    Some(build_terrain_adding_buttons().into_element())
+                    Some(build_terrain_adding_buttons(self.id).into_element())
                 } else {
                     None
                 },
@@ -218,7 +218,7 @@ impl models::Display {
                     }),
                 ],
                 if edit {
-                    Some(build_character_adding_buttons().into_element())
+                    Some(build_character_adding_buttons(self.id).into_element())
                 } else {
                     None
                 },
@@ -253,20 +253,54 @@ impl models::Display {
     }
 }
 
-fn build_terrain_adding_buttons<'a>() -> elements::Div<'a> {
+fn build_terrain_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
     elements::Div::style_less(
         models::Terrain::all_values()
             .into_iter()
-            .map(|x| x.into_html().into_element())
+            .map(|x| {
+                elements::Form {
+                    formmethod: attributes::Formmethod {
+                        inner: units::FormmethodValue::Post,
+                    },
+                    action: Some(attributes::Action {
+                        value: units::SourceValue::new(format!(
+                            "/displays/{}/edit/terrain/{}",
+                            display_id,
+                            x.url_frag_string()
+                        )),
+                    }),
+                    inputs: Vec::new(),
+                    button: elements::Button::style_less(x.into_html().into_element()),
+                    styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+                }
+                .into_element()
+            })
             .collect(),
     )
 }
 
-fn build_character_adding_buttons<'a>() -> elements::Div<'a> {
+fn build_character_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
     elements::Div::style_less(
         models::Character::all_values()
             .into_iter()
-            .map(|x| x.into_html().into_element())
+            .map(|x| {
+                elements::Form {
+                    formmethod: attributes::Formmethod {
+                        inner: units::FormmethodValue::Post,
+                    },
+                    action: Some(attributes::Action {
+                        value: units::SourceValue::new(format!(
+                            "/displays/{}/edit/character/{}",
+                            display_id,
+                            x.url_frag_string()
+                        )),
+                    }),
+                    inputs: Vec::new(),
+                    button: elements::Button::style_less(x.into_html().into_element()),
+                    styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+                }
+                .into_element()
+            })
             .collect(),
     )
 }
