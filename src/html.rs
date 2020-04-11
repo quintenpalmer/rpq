@@ -117,10 +117,10 @@ impl models::Map {
     fn into_html(&self, current_selection: Option<(u32, u32)>) -> htmldsl::Element {
         let (max_x, max_y) = self.maxes();
         let mut empty_rendered_map: Vec<Vec<(models::Terrain, Option<models::Character>, bool)>> =
-            (0..max_x)
+            (0..max_y)
                 .into_iter()
                 .map(|_| {
-                    (0..max_y)
+                    (0..max_x)
                         .into_iter()
                         .map(|_| (self.default_terrain.clone(), None, false))
                         .collect()
