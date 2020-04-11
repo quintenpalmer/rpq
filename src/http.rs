@@ -42,13 +42,13 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 
 fn index_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
-    let display = match db.read_display() {
+    let displays = match db.get_displays() {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::index(
-        display,
+        displays,
     )))))
 }
 
@@ -65,7 +65,7 @@ fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error
         Err(e) => return internal_server_error(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(html::index(
+    Ok(Response::new(Body::from(html::render_page(html::display(
         display,
     )))))
 }
@@ -95,7 +95,7 @@ fn move_cursor(display_id_str: &str, direction_str: &str) -> Result<Response<Bod
         Err(e) => return internal_server_error(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(html::index(
+    Ok(Response::new(Body::from(html::render_page(html::display(
         display,
     )))))
 }

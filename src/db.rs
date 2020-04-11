@@ -36,24 +36,12 @@ impl DB {
         DB { _nothing: () }
     }
 
-    pub fn read_display(&self) -> Result<models::Display, String> {
-        let mut rdr = csv::Reader::from_reader(
-            File::open(DISPLAY_DB_FILE_NAME)
-                .map_err(|e| format!("could not read from file: {:?}", e))?,
-        );
-        let mut o_cursor = None;
-        for result in rdr.deserialize() {
-            if o_cursor.is_none() {
-                let record: DBDisplay =
-                    result.map_err(|e| format!("could not read row for display: {:?}", e))?;
-                o_cursor = Some(record);
-            }
-        }
-        let cursor = match o_cursor {
-            Some(v) => v,
-            None => return Err("could not find a display db entry".to_string()),
-        };
-        Ok(display_model_from_db(cursor))
+    pub fn get_displays(&self) -> Result<Vec<models::Display>, String> {
+        Ok(self
+            .read_db_displays()?
+            .into_iter()
+            .map(|x| display_model_from_db(x))
+            .collect())
     }
 
     pub fn get_display(&self, display_id: u32) -> Result<models::Display, String> {
@@ -68,6 +56,21 @@ impl DB {
             }
         }
         return Err("could not find character with supplied id".into());
+    }
+
+    fn read_db_displays(&self) -> Result<Vec<DBDisplay>, String> {
+        let mut rdr = csv::Reader::from_reader(
+            File::open(DISPLAY_DB_FILE_NAME)
+                .map_err(|e| format!("could not read from file: {:?}", e))?,
+        );
+        let records = rdr
+            .deserialize()
+            .into_iter()
+            .map(|result| -> Result<DBDisplay, String> {
+                result.map_err(|e| format!("could not read row for display: {:?}", e))
+            })
+            .collect::<Result<Vec<DBDisplay>, String>>()?;
+        Ok(records)
     }
 
     pub fn write_display(&self, display: &models::Display) -> Result<(), String> {
