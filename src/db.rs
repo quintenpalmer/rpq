@@ -55,7 +55,7 @@ impl DB {
                 return Ok(display_model_from_db(record));
             }
         }
-        return Err("could not find character with supplied id".into());
+        return Err("could not find display with supplied id".into());
     }
 
     fn read_db_displays(&self) -> Result<Vec<DBDisplay>, String> {
