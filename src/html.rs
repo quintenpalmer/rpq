@@ -118,7 +118,7 @@ impl models::Character {
 }
 
 impl models::Map {
-    fn into_html(self, current_selection: Option<(u32, u32)>) -> htmldsl::Element {
+    fn into_html(&self, current_selection: Option<(u32, u32)>) -> htmldsl::Element {
         let (max_x, max_y) = self.maxes();
         let mut empty_rendered_map: Vec<Vec<(models::Terrain, Option<models::Character>, bool)>> =
             (0..max_y)
@@ -187,7 +187,7 @@ impl models::Map {
 }
 
 impl models::Display {
-    fn into_html(self) -> htmldsl::Element {
+    fn into_html(&self) -> htmldsl::Element {
         let (terrain, o_character) = self.map.at(&self.current_selection);
 
         let hover_info = elements::Div::style_less(vec![
