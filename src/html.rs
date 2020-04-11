@@ -72,8 +72,16 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
 
 fn current_selection_marker() -> htmldsl::Element {
     htmldsl::tag(Box::new(
-        elements::Img::style_less_with_src("/images/marker.png".to_string())
-            .add_style(vec![&styles::Display::Block, &styles::Position::Absolute]),
+        elements::Img::style_less_with_src("/images/marker.png".to_string()).add_style(vec![
+            &styles::Display::Block,
+            &styles::Position::Absolute,
+            &styles::Top {
+                value: units::Number::Length(0, units::Length::Pixel),
+            },
+            &styles::Left {
+                value: units::Number::Length(0, units::Length::Pixel),
+            },
+        ]),
     ))
 }
 
@@ -99,7 +107,16 @@ impl models::Character {
     fn into_html(&self) -> htmldsl::Element {
         htmldsl::tag(Box::new(
             elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
-                .add_style(vec![&styles::Display::Block, &styles::Position::Absolute]),
+                .add_style(vec![
+                    &styles::Display::Block,
+                    &styles::Position::Absolute,
+                    &styles::Top {
+                        value: units::Number::Length(0, units::Length::Pixel),
+                    },
+                    &styles::Left {
+                        value: units::Number::Length(0, units::Length::Pixel),
+                    },
+                ]),
         ))
     }
 
@@ -146,17 +163,20 @@ impl models::Map {
                         elements::Tr::style_less(
                             row.into_iter()
                                 .map(|data| {
-                                    elements::Td::style_less(maybe_append(
-                                        maybe_append(
-                                            vec![data.0.into_html()],
-                                            data.1.map(|x| x.into_html()),
-                                        ),
-                                        if data.2 {
-                                            Some(current_selection_marker())
-                                        } else {
-                                            None
-                                        },
-                                    ))
+                                    elements::Td::style_less(vec![htmldsl::tag(Box::new(
+                                        elements::Div::style_less(maybe_append(
+                                            maybe_append(
+                                                vec![data.0.into_html()],
+                                                data.1.map(|x| x.into_html()),
+                                            ),
+                                            if data.2 {
+                                                Some(current_selection_marker())
+                                            } else {
+                                                None
+                                            },
+                                        ))
+                                        .add_style(vec![&styles::Position::Relative]),
+                                    ))])
                                 })
                                 .collect(),
                         )
