@@ -99,6 +99,11 @@ fn display_model_from_db(d: DBDisplay) -> models::Display {
                         .into_iter()
                         .map(|i| ((i, 11), models::Terrain::Rock)),
                 )
+                .chain(
+                    (0..12)
+                        .into_iter()
+                        .map(|i| ((i, 12), models::Terrain::Dirt)),
+                )
                 .collect::<BTreeMap<_, _>>(),
             characters: vec![
                 ((4, 3), models::Character::Knight),
