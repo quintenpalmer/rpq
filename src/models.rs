@@ -49,7 +49,7 @@ impl Terrain {
     }
 }
 
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum Character {
     Knight,
     Mage,

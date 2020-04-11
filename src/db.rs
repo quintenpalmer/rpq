@@ -8,11 +8,13 @@ use super::models;
 const DISPLAY_DB_FILE_NAME: &'static str = "db/display.csv";
 const MAP_DB_FILE_NAME: &'static str = "db/map.csv";
 const TILES_DB_FILE_NAME: &'static str = "db/tiles.csv";
+const CHARACTER_DB_FILE_NAME: &'static str = "db/characters.csv";
 
 const ALL_DB_FILE_NAMES: &'static [&'static str] = &[
     DISPLAY_DB_FILE_NAME,
     MAP_DB_FILE_NAME,
     TILES_DB_FILE_NAME,
+    CHARACTER_DB_FILE_NAME,
 ];
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -35,6 +37,14 @@ struct DBMap {
 struct DBTileLine {
     map_id: u32,
     terrain: models::Terrain,
+    x: u32,
+    y: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct DBCharacter {
+    map_id: u32,
+    character: models::Character,
     x: u32,
     y: u32,
 }
@@ -64,7 +74,8 @@ impl DB {
             .map(|x| {
                 let map = self.get_db_map(x.map_id)?;
                 let tiles = self.read_db_tile_lines_for_map_id(map.id)?;
-                Ok(display_model_from_db(x, map, tiles))
+                let characters = self.read_db_characters_for_map_id(map.id)?;
+                Ok(display_model_from_db(x, map, tiles, characters))
             })
             .collect::<Result<Vec<models::Display>, String>>()?)
     }
@@ -222,9 +233,37 @@ impl DB {
             .collect::<Result<Vec<DBTileLine>, String>>()?;
         Ok(records)
     }
+
+    fn read_db_characters_for_map_id(&self, map_id: u32) -> Result<Vec<DBCharacter>, String> {
+        Ok(self
+            .read_db_characters()?
+            .into_iter()
+            .filter(|record| record.map_id == map_id)
+            .collect())
+    }
+
+    fn read_db_characters(&self) -> Result<Vec<DBCharacter>, String> {
+        let mut rdr = csv::Reader::from_reader(
+            File::open(CHARACTER_DB_FILE_NAME)
+                .map_err(|e| format!("could not read from file: {:?}", e))?,
+        );
+        let records = rdr
+            .deserialize()
+            .into_iter()
+            .map(|result| -> Result<DBCharacter, String> {
+                result.map_err(|e| format!("could not read row for record: {:?}", e))
+            })
+            .collect::<Result<Vec<DBCharacter>, String>>()?;
+        Ok(records)
+    }
 }
 
-fn display_model_from_db(d: DBDisplay, m: DBMap, tiles: Vec<DBTileLine>) -> models::Display {
+fn display_model_from_db(
+    d: DBDisplay,
+    m: DBMap,
+    tiles: Vec<DBTileLine>,
+    characters: Vec<DBCharacter>,
+) -> models::Display {
     models::Display {
         id: d.id,
         map: models::Map {
@@ -233,13 +272,10 @@ fn display_model_from_db(d: DBDisplay, m: DBMap, tiles: Vec<DBTileLine>) -> mode
                 .into_iter()
                 .map(|tile| ((tile.x, tile.y), tile.terrain))
                 .collect::<BTreeMap<_, _>>(),
-            characters: vec![
-                ((4, 3), models::Character::Knight),
-                ((5, 5), models::Character::Mage),
-                ((1, 8), models::Character::Thief),
-            ]
-            .into_iter()
-            .collect::<BTreeMap<_, _>>(),
+            characters: characters
+                .into_iter()
+                .map(|character| ((character.x, character.y), character.character))
+                .collect::<BTreeMap<_, _>>(),
             hint_max_x: m.hint_max_x,
             hint_max_y: m.hint_max_y,
         },
