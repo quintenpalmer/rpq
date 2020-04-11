@@ -205,8 +205,13 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
 
 pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        htmldsl::tag(Box::new(elements::H1::style_less(vec![htmldsl::text(
-            "the map".into(),
+        htmldsl::tag(Box::new(elements::H1::style_less(vec![htmldsl::tag(
+            Box::new(elements::A::style_less(
+                attributes::Href {
+                    value: units::SourceValue::new("/".into()),
+                },
+                vec![htmldsl::text("the map".into())],
+            )),
         )]))),
         display.into_html(),
         htmldsl::tag(Box::new(elements::Form {
