@@ -107,7 +107,7 @@ impl DB {
 
 fn display_model_from_db(d: DBDisplay) -> models::Display {
     models::Display {
-        id: 1,
+        id: d.id,
         map: models::Map {
             default_terrain: models::Terrain::Grass,
             specified_terrain: (0..12)
