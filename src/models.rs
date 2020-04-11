@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
 
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug)]
 pub enum Direction {
     Right,
@@ -29,7 +31,7 @@ impl Direction {
     }
 }
 
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum Terrain {
     Grass,
     Dirt,
