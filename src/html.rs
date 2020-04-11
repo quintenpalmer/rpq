@@ -260,35 +260,41 @@ pub fn index<'a>() -> elements::Body<'a> {
 }
 
 pub fn displays<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
-    elements::Body::style_less(
-        displays
-            .into_iter()
-            .map(|display| {
-                elements::A::style_less(
-                    attributes::Href {
-                        value: units::SourceValue::new(format!("/displays/{}", display.id)),
-                    },
-                    vec![htmldsl::text(format!("game: {}", display.id))],
+    elements::Body::style_less(vec![
+        index_link(),
+        elements::Div::style_less(
+            displays
+                .into_iter()
+                .map(|display| {
+                    elements::A::style_less(
+                        attributes::Href {
+                            value: units::SourceValue::new(format!("/displays/{}", display.id)),
+                        },
+                        vec![htmldsl::text(format!("game: {}", display.id))],
+                    )
+                    .into_element()
+                })
+                .chain(
+                    vec![elements::Form {
+                        formmethod: attributes::Formmethod {
+                            inner: units::FormmethodValue::Post,
+                        },
+                        action: Some(attributes::Action {
+                            value: units::SourceValue::new("/displays".into()),
+                        }),
+                        inputs: Vec::new(),
+                        button: elements::Button::style_less(htmldsl::text(
+                            "add map display".into(),
+                        )),
+                        styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+                    }
+                    .into_element()]
+                    .into_iter(),
                 )
-                .into_element()
-            })
-            .chain(
-                vec![elements::Form {
-                    formmethod: attributes::Formmethod {
-                        inner: units::FormmethodValue::Post,
-                    },
-                    action: Some(attributes::Action {
-                        value: units::SourceValue::new("/displays".into()),
-                    }),
-                    inputs: Vec::new(),
-                    button: elements::Button::style_less(htmldsl::text("add map display".into())),
-                    styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
-                }
-                .into_element()]
-                .into_iter(),
-            )
-            .collect(),
-    )
+                .collect(),
+        )
+        .into_element(),
+    ])
 }
 
 pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
