@@ -2,6 +2,7 @@ use hyper::{Body, Method, Request, Response, StatusCode};
 use std::fs::File;
 use std::io::{ErrorKind, Read};
 
+use super::db;
 use super::html;
 use super::models;
 
@@ -36,16 +37,32 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 }
 
 fn index_response() -> Result<Response<Body>, hyper::Error> {
-    Ok(Response::new(Body::from(html::render_page(html::index()))))
+    let db = db::DB::new();
+    let display = match db.read_display() {
+        Ok(d) => d,
+        Err(e) => return internal_server_error(e),
+    };
+
+    Ok(Response::new(Body::from(html::render_page(html::index(
+        display,
+    )))))
 }
 
 fn move_cursor(direction_str: &str) -> Result<Response<Body>, hyper::Error> {
+    let db = db::DB::new();
+    let display = match db.read_display() {
+        Ok(d) => d,
+        Err(e) => return internal_server_error(e),
+    };
+
     let direction = match models::Direction::parse(direction_str) {
         Some(d) => d,
         None => return bad_request_response("direction must be one of right, up, left, down"),
     };
     println!("direction: {:?}", direction);
-    Ok(Response::new(Body::from(html::render_page(html::index()))))
+    Ok(Response::new(Body::from(html::render_page(html::index(
+        display,
+    )))))
 }
 
 fn not_found_response() -> Result<Response<Body>, hyper::Error> {

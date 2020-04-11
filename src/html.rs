@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use htmldsl::attributes;
 use htmldsl::elements;
 use htmldsl::style_sheet;
@@ -185,51 +183,12 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
     }
 }
 
-pub fn index<'a>() -> elements::Body<'a> {
+pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         htmldsl::tag(Box::new(elements::H1::style_less(vec![htmldsl::text(
             "the map".into(),
         )]))),
-        models::Display {
-            map: models::Map {
-                default_terrain: models::Terrain::Grass,
-                specified_terrain: (0..12)
-                    .into_iter()
-                    .map(|i| ((9, i), models::Terrain::Dirt))
-                    .chain(
-                        (0..12)
-                            .into_iter()
-                            .map(|i| ((10, i), models::Terrain::Dirt)),
-                    )
-                    .chain(
-                        (0..12)
-                            .into_iter()
-                            .map(|i| ((i, 10), models::Terrain::Dirt)),
-                    )
-                    .chain(
-                        (0..12)
-                            .into_iter()
-                            .map(|i| ((11, i), models::Terrain::Rock)),
-                    )
-                    .chain(
-                        (0..12)
-                            .into_iter()
-                            .map(|i| ((i, 11), models::Terrain::Rock)),
-                    )
-                    .collect::<BTreeMap<_, _>>(),
-                characters: vec![
-                    ((4, 3), models::Character::Knight),
-                    ((5, 5), models::Character::Mage),
-                    ((1, 8), models::Character::Thief),
-                ]
-                .into_iter()
-                .collect::<BTreeMap<_, _>>(),
-                hint_max_x: 12,
-                hint_max_y: 12,
-            },
-            current_selection: (4, 5),
-        }
-        .into_html(),
+        display.into_html(),
         htmldsl::tag(Box::new(elements::Form {
             formmethod: attributes::Formmethod {
                 inner: units::FormmethodValue::Post,

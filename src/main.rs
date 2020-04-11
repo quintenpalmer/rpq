@@ -1,3 +1,4 @@
+mod db;
 mod html;
 mod http;
 mod models;
