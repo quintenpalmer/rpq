@@ -123,6 +123,33 @@ fn edit_display_set_value(
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
+    let display_id = match display_id_str.parse::<u32>() {
+        Ok(v) => v,
+        Err(_e) => return bad_request_response("must supply map id as u32"),
+    };
+
+    match match value_type {
+        TerrainOrCharacter::Terrain => db.update_display_terrain(
+            display_id,
+            match models::Terrain::parse_str(value_value) {
+                Some(v) => v,
+                None => return bad_request_response("terrain in path invalid"),
+            },
+        ),
+        TerrainOrCharacter::Character => db.update_display_character(
+            display_id,
+            match models::Character::parse_str(value_value) {
+                Some(v) => v,
+                None => return bad_request_response("character in path invalid"),
+            },
+        ),
+    } {
+        Ok(()) => (),
+        Err(e) => {
+            return internal_server_error(format!("could not update terrain or character: {:?}", e))
+        }
+    };
+
     edit_display_response(display_id_str)
 }
 

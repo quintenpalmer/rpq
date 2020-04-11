@@ -256,6 +256,22 @@ impl DB {
             .collect::<Result<Vec<DBCharacter>, String>>()?;
         Ok(records)
     }
+
+    pub fn update_display_terrain(
+        &self,
+        display_id: u32,
+        terrain: models::Terrain,
+    ) -> Result<(), String> {
+        Ok(())
+    }
+
+    pub fn update_display_character(
+        &self,
+        display_id: u32,
+        terrain: models::Character,
+    ) -> Result<(), String> {
+        Ok(())
+    }
 }
 
 fn display_model_from_db(

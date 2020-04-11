@@ -43,6 +43,15 @@ impl Terrain {
         vec![Terrain::Grass, Terrain::Dirt, Terrain::Rock]
     }
 
+    pub fn parse_str(s: &str) -> Option<Self> {
+        match s {
+            "grass" => Some(Terrain::Grass),
+            "dirt" => Some(Terrain::Dirt),
+            "rock" => Some(Terrain::Rock),
+            _ => None,
+        }
+    }
+
     pub fn url_frag_string(&self) -> String {
         match self {
             Terrain::Grass => "grass",
@@ -72,6 +81,15 @@ pub enum Character {
 impl Character {
     pub fn all_values() -> Vec<Self> {
         vec![Character::Knight, Character::Mage, Character::Thief]
+    }
+
+    pub fn parse_str(s: &str) -> Option<Self> {
+        match s {
+            "knight" => Some(Character::Knight),
+            "mage" => Some(Character::Mage),
+            "thief" => Some(Character::Thief),
+            _ => None,
+        }
     }
 
     pub fn url_frag_string(&self) -> String {
