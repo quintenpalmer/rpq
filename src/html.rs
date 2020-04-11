@@ -152,10 +152,45 @@ impl models::Map {
             None => (),
         };
 
-        let at_info = match current_selection {
-            Some(cursor) => self.at(&cursor),
-            None => (&self.default_terrain, None),
-        };
+        elements::Table::style_less(
+            None,
+            elements::Tbody::style_less(
+                empty_rendered_map
+                    .into_iter()
+                    .map(|row| {
+                        elements::Tr::style_less(
+                            row.into_iter()
+                                .map(|data| {
+                                    elements::Td::style_less(vec![elements::Div::style_less(
+                                        maybe_append(
+                                            maybe_append(
+                                                vec![data.0.into_html()],
+                                                data.1.map(|x| x.into_html()),
+                                            ),
+                                            if data.2 {
+                                                Some(current_selection_marker())
+                                            } else {
+                                                None
+                                            },
+                                        ),
+                                    )
+                                    .add_style(vec![&styles::Position::Relative])
+                                    .into_element()])
+                                })
+                                .collect(),
+                        )
+                    })
+                    .collect(),
+            ),
+        )
+        .add_style(vec![&styles::Display::Inline])
+        .into_element()
+    }
+}
+
+impl models::Display {
+    fn into_html(&self) -> htmldsl::Element {
+        let at_info = self.map.at(&self.current_selection);
 
         let hover_info = elements::Div::style_less(vec![
             elements::P::style_less(vec![
@@ -194,48 +229,10 @@ impl models::Map {
         .into_element();
 
         elements::Div::style_less(vec![
-            elements::Table::style_less(
-                None,
-                elements::Tbody::style_less(
-                    empty_rendered_map
-                        .into_iter()
-                        .map(|row| {
-                            elements::Tr::style_less(
-                                row.into_iter()
-                                    .map(|data| {
-                                        elements::Td::style_less(vec![elements::Div::style_less(
-                                            maybe_append(
-                                                maybe_append(
-                                                    vec![data.0.into_html()],
-                                                    data.1.map(|x| x.into_html()),
-                                                ),
-                                                if data.2 {
-                                                    Some(current_selection_marker())
-                                                } else {
-                                                    None
-                                                },
-                                            ),
-                                        )
-                                        .add_style(vec![&styles::Position::Relative])
-                                        .into_element()])
-                                    })
-                                    .collect(),
-                            )
-                        })
-                        .collect(),
-                ),
-            )
-            .add_style(vec![&styles::Display::Inline])
-            .into_element(),
+            self.map.into_html(Some(self.current_selection)),
             hover_info,
         ])
         .into_element()
-    }
-}
-
-impl models::Display {
-    fn into_html(&self) -> htmldsl::Element {
-        self.map.into_html(Some(self.current_selection))
     }
 }
 
