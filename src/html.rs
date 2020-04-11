@@ -107,12 +107,11 @@ impl models::Terrain {
 }
 
 impl models::Character {
-    fn into_html(self) -> htmldsl::Element {
+    fn into_html<'a>(self) -> elements::Img<'a> {
         absolute_hover(elements::Img::style_less_with_src(format!(
             "/images/{}.png",
             self.image_name()
         )))
-        .into_element()
     }
 
     fn image_name(&self) -> String {
@@ -162,7 +161,7 @@ impl models::Map {
                                         maybe_append(
                                             maybe_append(
                                                 vec![data.0.into_html().into_element()],
-                                                data.1.map(|x| x.into_html()),
+                                                data.1.map(|x| x.into_html().into_element()),
                                             ),
                                             if data.2 {
                                                 Some(current_selection_marker())
@@ -202,7 +201,7 @@ impl models::Display {
                     Some(ref v) => v.display_string(),
                     None => "--".into(),
                 }),
-                o_character.map_or(current_selection_marker(), |x| x.into_html()),
+                o_character.map_or(current_selection_marker(), |x| x.into_html().into_element()),
             ])
             .into_element(),
         ])
