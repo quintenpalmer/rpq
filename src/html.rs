@@ -71,18 +71,23 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
 }
 
 fn current_selection_marker() -> htmldsl::Element {
-    elements::Img::style_less_with_src("/images/marker.png".to_string())
-        .add_style(vec![
-            &styles::Display::Block,
-            &styles::Position::Absolute,
-            &styles::Top {
-                value: units::Number::Length(0, units::Length::Pixel),
-            },
-            &styles::Left {
-                value: units::Number::Length(0, units::Length::Pixel),
-            },
-        ])
-        .into_element()
+    absolute_hover(elements::Img::style_less_with_src(
+        "/images/marker.png".to_string(),
+    ))
+    .into_element()
+}
+
+fn absolute_hover<'a, T: TagRenderableStyleSetter<'a>>(element: T) -> T {
+    element.add_style(vec![
+        &styles::Display::Block,
+        &styles::Position::Absolute,
+        &styles::Top {
+            value: units::Number::Length(0, units::Length::Pixel),
+        },
+        &styles::Left {
+            value: units::Number::Length(0, units::Length::Pixel),
+        },
+    ])
 }
 
 impl models::Terrain {
@@ -104,18 +109,11 @@ impl models::Terrain {
 
 impl models::Character {
     fn into_html(&self) -> htmldsl::Element {
-        elements::Img::style_less_with_src(format!("/images/{}.png", self.image_name()))
-            .add_style(vec![
-                &styles::Display::Block,
-                &styles::Position::Absolute,
-                &styles::Top {
-                    value: units::Number::Length(0, units::Length::Pixel),
-                },
-                &styles::Left {
-                    value: units::Number::Length(0, units::Length::Pixel),
-                },
-            ])
-            .into_element()
+        absolute_hover(elements::Img::style_less_with_src(format!(
+            "/images/{}.png",
+            self.image_name()
+        )))
+        .into_element()
     }
 
     fn image_name(&self) -> String {
