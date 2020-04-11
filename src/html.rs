@@ -152,7 +152,7 @@ impl models::Map {
             None => (),
         };
 
-        elements::Table::style_less(
+        elements::Div::style_less(vec![elements::Table::style_less(
             None,
             elements::Tbody::style_less(
                 empty_rendered_map
@@ -183,6 +183,7 @@ impl models::Map {
                     .collect(),
             ),
         )
+        .into_element()])
         .into_element()
     }
 }
