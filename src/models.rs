@@ -61,9 +61,18 @@ pub struct Display {
 
 impl Display {
     pub fn move_cursor(&mut self, direction: Direction) {
+        let (max_x, max_y) = self.map.maxes();
         match direction {
-            Direction::Right => self.current_selection.0 += 1,
-            Direction::Up => self.current_selection.1 += 1,
+            Direction::Right => {
+                if self.current_selection.0 <= max_x - 2 {
+                    self.current_selection.0 += 1
+                }
+            }
+            Direction::Up => {
+                if self.current_selection.1 <= max_y - 2 {
+                    self.current_selection.1 += 1
+                }
+            }
             Direction::Left => {
                 if self.current_selection.0 > 0 {
                     self.current_selection.0 -= 1
