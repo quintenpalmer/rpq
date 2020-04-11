@@ -256,6 +256,7 @@ pub fn index<'a>() -> elements::Body<'a> {
 pub fn displays<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
+        displays_link(),
         elements::Div::style_less(
             displays
                 .into_iter()
