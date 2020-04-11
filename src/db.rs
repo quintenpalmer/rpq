@@ -7,10 +7,12 @@ use super::models;
 
 const DISPLAY_DB_FILE_NAME: &'static str = "db/display.csv";
 const MAP_DB_FILE_NAME: &'static str = "db/map.csv";
+const TILES_DB_FILE_NAME: &'static str = "db/tiles.csv";
 
 const ALL_DB_FILE_NAMES: &'static [&'static str] = &[
     DISPLAY_DB_FILE_NAME,
     MAP_DB_FILE_NAME,
+    TILES_DB_FILE_NAME,
 ];
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -27,6 +29,14 @@ struct DBMap {
     default_terrain: models::Terrain,
     hint_max_x: u32,
     hint_max_y: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct DBTileLine {
+    map_id: u32,
+    terrain: models::Terrain,
+    x: u32,
+    y: u32,
 }
 
 pub struct DB {
@@ -53,7 +63,8 @@ impl DB {
             .into_iter()
             .map(|x| {
                 let map = self.get_db_map(x.map_id)?;
-                Ok(display_model_from_db(x, map))
+                let tiles = self.read_db_tile_lines_for_map_id(map.id)?;
+                Ok(display_model_from_db(x, map, tiles))
             })
             .collect::<Result<Vec<models::Display>, String>>()?)
     }
@@ -188,41 +199,39 @@ impl DB {
 
         Ok(())
     }
+
+    fn read_db_tile_lines_for_map_id(&self, map_id: u32) -> Result<Vec<DBTileLine>, String> {
+        Ok(self
+            .read_db_tile_lines()?
+            .into_iter()
+            .filter(|record| record.map_id == map_id)
+            .collect())
+    }
+
+    fn read_db_tile_lines(&self) -> Result<Vec<DBTileLine>, String> {
+        let mut rdr = csv::Reader::from_reader(
+            File::open(TILES_DB_FILE_NAME)
+                .map_err(|e| format!("could not read from file: {:?}", e))?,
+        );
+        let records = rdr
+            .deserialize()
+            .into_iter()
+            .map(|result| -> Result<DBTileLine, String> {
+                result.map_err(|e| format!("could not read row for record: {:?}", e))
+            })
+            .collect::<Result<Vec<DBTileLine>, String>>()?;
+        Ok(records)
+    }
 }
 
-fn display_model_from_db(d: DBDisplay, m: DBMap) -> models::Display {
+fn display_model_from_db(d: DBDisplay, m: DBMap, tiles: Vec<DBTileLine>) -> models::Display {
     models::Display {
         id: d.id,
         map: models::Map {
             default_terrain: m.default_terrain,
-            specified_terrain: (0..12)
+            specified_terrain: tiles
                 .into_iter()
-                .map(|i| ((9, i), models::Terrain::Dirt))
-                .chain(
-                    (0..12)
-                        .into_iter()
-                        .map(|i| ((10, i), models::Terrain::Dirt)),
-                )
-                .chain(
-                    (0..12)
-                        .into_iter()
-                        .map(|i| ((i, 10), models::Terrain::Dirt)),
-                )
-                .chain(
-                    (0..12)
-                        .into_iter()
-                        .map(|i| ((11, i), models::Terrain::Rock)),
-                )
-                .chain(
-                    (0..12)
-                        .into_iter()
-                        .map(|i| ((i, 11), models::Terrain::Rock)),
-                )
-                .chain(
-                    (0..12)
-                        .into_iter()
-                        .map(|i| ((i, 12), models::Terrain::Dirt)),
-                )
+                .map(|tile| ((tile.x, tile.y), tile.terrain))
                 .collect::<BTreeMap<_, _>>(),
             characters: vec![
                 ((4, 3), models::Character::Knight),
