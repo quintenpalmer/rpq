@@ -253,7 +253,7 @@ pub fn index<'a>(display: models::Display) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         elements::H1::style_less(vec![elements::A::style_less(
             attributes::Href {
-                value: units::SourceValue::new("/".into()),
+                value: units::SourceValue::new(format!("/displays/{}", display.id)),
             },
             vec![htmldsl::text("the map".into())],
         )
