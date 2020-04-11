@@ -42,9 +42,7 @@ impl Terrain {
     pub fn all_values() -> Vec<Self> {
         vec![Terrain::Grass, Terrain::Dirt, Terrain::Rock]
     }
-}
 
-impl Terrain {
     pub fn url_frag_string(&self) -> String {
         match self {
             Terrain::Grass => "grass",
@@ -75,9 +73,7 @@ impl Character {
     pub fn all_values() -> Vec<Self> {
         vec![Character::Knight, Character::Mage, Character::Thief]
     }
-}
 
-impl Character {
     pub fn url_frag_string(&self) -> String {
         match self {
             Character::Knight => "knight",
