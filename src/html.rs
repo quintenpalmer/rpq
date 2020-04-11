@@ -71,9 +71,7 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
 }
 
 fn current_selection_marker<'a>() -> elements::Img<'a> {
-    absolute_hover(elements::Img::style_less_with_src(
-        "/images/marker.png".to_string(),
-    ))
+    elements::Img::style_less_with_src("/images/marker.png".to_string())
 }
 
 fn absolute_hover<'a, T: TagRenderableStyleSetter<'a>>(element: T) -> T {
@@ -163,7 +161,10 @@ impl models::Map {
                                                 data.1.map(|x| x.into_html().into_element()),
                                             ),
                                             if data.2 {
-                                                Some(current_selection_marker().into_element())
+                                                Some(
+                                                    absolute_hover(current_selection_marker())
+                                                        .into_element(),
+                                                )
                                             } else {
                                                 None
                                             },
