@@ -127,13 +127,13 @@ impl models::Map {
                 })
                 .collect();
         for ((x, y), terrain) in self.specified_terrain.iter() {
-            empty_rendered_map[*x as usize][*y as usize].0 = terrain.clone();
+            empty_rendered_map[*y as usize][*x as usize].0 = terrain.clone();
         }
         for ((x, y), character) in self.characters.iter() {
-            empty_rendered_map[*x as usize][*y as usize].1 = Some(character.clone());
+            empty_rendered_map[*y as usize][*x as usize].1 = Some(character.clone());
         }
         match current_selection {
-            Some((x, y)) => empty_rendered_map[x as usize][y as usize].2 = true,
+            Some((x, y)) => empty_rendered_map[y as usize][x as usize].2 = true,
             None => (),
         };
 
