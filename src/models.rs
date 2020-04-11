@@ -61,8 +61,16 @@ impl Display {
         match direction {
             Direction::Right => self.current_selection.0 += 1,
             Direction::Up => self.current_selection.1 += 1,
-            Direction::Left => self.current_selection.0 -= 1,
-            Direction::Down => self.current_selection.1 -= 1,
+            Direction::Left => {
+                if self.current_selection.0 > 0 {
+                    self.current_selection.0 -= 1
+                }
+            }
+            Direction::Down => {
+                if self.current_selection.1 > 0 {
+                    self.current_selection.1 -= 1
+                }
+            }
         }
     }
 }
