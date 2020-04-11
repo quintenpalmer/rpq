@@ -90,7 +90,7 @@ impl DB {
         self.write_db_displays(records)
     }
 
-    pub fn write_db_displays(&self, records: Vec<DBDisplay>) -> Result<(), String> {
+    fn write_db_displays(&self, records: Vec<DBDisplay>) -> Result<(), String> {
         let mut writer = csv::Writer::from_path(DISPLAY_DB_FILE_NAME).unwrap();
 
         for record in records.into_iter() {
