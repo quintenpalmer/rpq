@@ -295,7 +295,7 @@ pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
         displays_link(),
-        elements::H1::style_less(vec![elements::A::style_less(
+        elements::H3::style_less(vec![elements::A::style_less(
             attributes::Href {
                 value: units::SourceValue::new(format!("/displays/{}", display.id)),
             },
