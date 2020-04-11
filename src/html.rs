@@ -188,21 +188,22 @@ impl models::Map {
 
 impl models::Display {
     fn into_html(self) -> htmldsl::Element {
-        let at_info = self.map.at(&self.current_selection);
+        let (terrain, o_character) = self.map.at(&self.current_selection);
 
         let hover_info = elements::Div::style_less(vec![
             elements::P::style_less(vec![
                 htmldsl::text("Terrain: ".into()),
-                htmldsl::text(at_info.0.display_string()),
-                at_info.0.into_html(),
+                htmldsl::text(terrain.display_string()),
+                terrain.into_html(),
             ])
             .into_element(),
             elements::P::style_less(vec![
                 htmldsl::text("Character: ".into()),
-                htmldsl::text(at_info.1.map_or("--".into(), |x| x.display_string())),
-                at_info
-                    .1
-                    .map_or(current_selection_marker(), |x| x.into_html()),
+                htmldsl::text(match o_character {
+                    Some(ref v) => v.display_string(),
+                    None => "--".into(),
+                }),
+                o_character.map_or(current_selection_marker(), |x| x.into_html()),
             ])
             .into_element(),
         ])

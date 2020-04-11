@@ -84,12 +84,13 @@ impl Map {
         )
     }
 
-    pub fn at(&self, cursor: &(u32, u32)) -> (&Terrain, Option<&Character>) {
+    pub fn at(&self, cursor: &(u32, u32)) -> (Terrain, Option<Character>) {
         (
             self.specified_terrain
                 .get(cursor)
-                .unwrap_or(&self.default_terrain),
-            self.characters.get(cursor),
+                .map(|x| x.clone())
+                .unwrap_or(self.default_terrain.clone()),
+            self.characters.get(cursor).map(|x| x.clone()),
         )
     }
 }
