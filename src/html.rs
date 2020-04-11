@@ -296,13 +296,51 @@ pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
         displays_link(),
-        elements::H3::style_less(vec![elements::A::style_less(
-            attributes::Href {
-                value: units::SourceValue::new(format!("/displays/{}", display.id)),
-            },
-            vec![htmldsl::text("this map".into())],
-        )
-        .into_element()])
+        elements::H3::style_less(vec![
+            elements::A::style_less(
+                attributes::Href {
+                    value: units::SourceValue::new(format!("/displays/{}", display.id)),
+                },
+                vec![htmldsl::text("this map".into())],
+            )
+            .into_element(),
+            elements::A::style_less(
+                attributes::Href {
+                    value: units::SourceValue::new(format!("/displays/{}/edit", display.id)),
+                },
+                vec![htmldsl::text("edit".into())],
+            )
+            .into_element(),
+        ])
+        .into_element(),
+        display.into_html(),
+        cursor_form_button(display.id, models::Direction::Left),
+        cursor_form_button(display.id, models::Direction::Up),
+        cursor_form_button(display.id, models::Direction::Down),
+        cursor_form_button(display.id, models::Direction::Right),
+    ])
+}
+
+pub fn edit_display<'a>(display: models::Display) -> elements::Body<'a> {
+    elements::Body::style_less(vec![
+        index_link(),
+        displays_link(),
+        elements::H3::style_less(vec![
+            elements::A::style_less(
+                attributes::Href {
+                    value: units::SourceValue::new(format!("/displays/{}", display.id)),
+                },
+                vec![htmldsl::text("view map".into())],
+            )
+            .into_element(),
+            elements::A::style_less(
+                attributes::Href {
+                    value: units::SourceValue::new(format!("/displays/{}/edit", display.id)),
+                },
+                vec![htmldsl::text("editing".into())],
+            )
+            .into_element(),
+        ])
         .into_element(),
         display.into_html(),
         cursor_form_button(display.id, models::Direction::Left),

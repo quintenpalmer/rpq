@@ -29,6 +29,7 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         (&Method::GET, ["displays"]) => displays_response(),
         (&Method::POST, ["displays"]) => displays_create_response(),
         (&Method::GET, ["displays", display_id]) => display_response(display_id),
+        (&Method::GET, ["displays", display_id, "edit"]) => edit_display_response(display_id),
 
         (&Method::POST, ["displays", display_id, "cursor", direction]) => {
             move_cursor(display_id, direction)
@@ -84,6 +85,24 @@ fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error
     Ok(Response::new(Body::from(html::render_page(html::display(
         display,
     )))))
+}
+
+fn edit_display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error> {
+    let db = db::DB::new();
+
+    let display_id = match display_id_str.parse::<u32>() {
+        Ok(v) => v,
+        Err(_e) => return bad_request_response("must supply map id as u32"),
+    };
+
+    let display = match db.get_display(display_id) {
+        Ok(d) => d,
+        Err(e) => return internal_server_error(e),
+    };
+
+    Ok(Response::new(Body::from(html::render_page(
+        html::edit_display(display),
+    ))))
 }
 
 fn move_cursor(display_id_str: &str, direction_str: &str) -> Result<Response<Body>, hyper::Error> {
