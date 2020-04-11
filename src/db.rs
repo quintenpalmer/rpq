@@ -13,6 +13,7 @@ const ALL_DB_FILE_NAMES: &'static [&'static str] = &[
 
 #[derive(Serialize, Deserialize)]
 struct DBDisplay {
+    id: u32,
     cursor_x: u32,
     cursor_y: u32,
 }
@@ -55,8 +56,23 @@ impl DB {
         Ok(display_model_from_db(cursor))
     }
 
+    pub fn get_display(&self, display_id: u32) -> Result<models::Display, String> {
+        let mut rdr = csv::Reader::from_reader(
+            File::open(DISPLAY_DB_FILE_NAME)
+                .map_err(|e| format!("could not read from file: {:?}", e))?,
+        );
+        for result in rdr.deserialize() {
+            let record: DBDisplay = result.unwrap();
+            if record.id == display_id {
+                return Ok(display_model_from_db(record));
+            }
+        }
+        return Err("could not find character with supplied id".into());
+    }
+
     pub fn write_display(&self, display: &models::Display) -> Result<(), String> {
         let records = vec![DBDisplay {
+            id: display.id,
             cursor_x: display.current_selection.0,
             cursor_y: display.current_selection.1,
         }];
@@ -74,6 +90,7 @@ impl DB {
 
 fn display_model_from_db(d: DBDisplay) -> models::Display {
     models::Display {
+        id: 1,
         map: models::Map {
             default_terrain: models::Terrain::Grass,
             specified_terrain: (0..12)

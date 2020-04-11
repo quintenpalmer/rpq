@@ -96,6 +96,7 @@ impl Map {
 }
 
 pub struct Display {
+    pub id: u32,
     pub map: Map,
     pub current_selection: (u32, u32),
 }
