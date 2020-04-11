@@ -26,9 +26,9 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Serve some instructions at /
         (&Method::GET, []) => index_response(),
 
-        (&Method::GET, ["display", display_id]) => display_response(display_id),
+        (&Method::GET, ["displays", display_id]) => display_response(display_id),
 
-        (&Method::POST, ["display", display_id, "cursor", direction]) => {
+        (&Method::POST, ["displays", display_id, "cursor", direction]) => {
             move_cursor(display_id, direction)
         }
 
