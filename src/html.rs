@@ -293,14 +293,7 @@ pub fn displays<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
 
 pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        elements::H1::style_less(vec![elements::A::style_less(
-            attributes::Href {
-                value: units::SourceValue::new("/".into()),
-            },
-            vec![htmldsl::text("home".into())],
-        )
-        .into_element()])
-        .into_element(),
+        index_link(),
         elements::H1::style_less(vec![elements::A::style_less(
             attributes::Href {
                 value: units::SourceValue::new(format!("/displays/{}", display.id)),
@@ -330,6 +323,17 @@ fn cursor_form_button(display_id: u32, dir: models::Direction) -> htmldsl::Eleme
         button: elements::Button::style_less(htmldsl::text(symbol.into())),
         styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
     }
+    .into_element()
+}
+
+fn index_link() -> htmldsl::Element {
+    elements::H1::style_less(vec![elements::A::style_less(
+        attributes::Href {
+            value: units::SourceValue::new("/".into()),
+        },
+        vec![htmldsl::text("home".into())],
+    )
+    .into_element()])
     .into_element()
 }
 
