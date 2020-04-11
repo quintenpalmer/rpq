@@ -36,11 +36,33 @@ pub enum Terrain {
     Rock,
 }
 
+impl Terrain {
+    pub fn display_string(&self) -> String {
+        match self {
+            Terrain::Grass => "Grass",
+            Terrain::Dirt => "Dirt",
+            Terrain::Rock => "Rock",
+        }
+        .into()
+    }
+}
+
 #[derive(Clone)]
 pub enum Character {
     Knight,
     Mage,
     Thief,
+}
+
+impl Character {
+    pub fn display_string(&self) -> String {
+        match self {
+            Character::Knight => "Knight",
+            Character::Mage => "Mage",
+            Character::Thief => "Thief",
+        }
+        .into()
+    }
 }
 
 pub struct Map {
@@ -59,6 +81,15 @@ impl Map {
                 |(acc_x, acc_y), (x, y)| (std::cmp::max(acc_x, *x), std::cmp::max(acc_y, *y)),
             ),
             |(acc_x, acc_y), (x, y)| (std::cmp::max(acc_x, *x), std::cmp::max(acc_y, *y)),
+        )
+    }
+
+    pub fn at(&self, cursor: &(u32, u32)) -> (&Terrain, Option<&Character>) {
+        (
+            self.specified_terrain
+                .get(cursor)
+                .unwrap_or(&self.default_terrain),
+            self.characters.get(cursor),
         )
     }
 }
