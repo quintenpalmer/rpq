@@ -55,3 +55,14 @@ pub struct Display {
     pub map: Map,
     pub current_selection: (u32, u32),
 }
+
+impl Display {
+    pub fn move_cursor(&mut self, direction: Direction) {
+        match direction {
+            Direction::Right => self.current_selection.0 += 1,
+            Direction::Up => self.current_selection.1 += 1,
+            Direction::Left => self.current_selection.0 -= 1,
+            Direction::Down => self.current_selection.1 -= 1,
+        }
+    }
+}

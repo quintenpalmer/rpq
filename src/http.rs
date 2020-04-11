@@ -50,7 +50,7 @@ fn index_response() -> Result<Response<Body>, hyper::Error> {
 
 fn move_cursor(direction_str: &str) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
-    let display = match db.read_display() {
+    let mut display = match db.read_display() {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
@@ -59,7 +59,14 @@ fn move_cursor(direction_str: &str) -> Result<Response<Body>, hyper::Error> {
         Some(d) => d,
         None => return bad_request_response("direction must be one of right, up, left, down"),
     };
-    println!("direction: {:?}", direction);
+
+    display.move_cursor(direction);
+
+    match db.write_display(&display) {
+        Ok(()) => (),
+        Err(e) => return internal_server_error(e),
+    };
+
     Ok(Response::new(Body::from(html::render_page(html::index(
         display,
     )))))

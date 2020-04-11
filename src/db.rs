@@ -54,6 +54,22 @@ impl DB {
         };
         Ok(display_model_from_db(cursor))
     }
+
+    pub fn write_display(&self, display: &models::Display) -> Result<(), String> {
+        let records = vec![DBDisplay {
+            cursor_x: display.current_selection.0,
+            cursor_y: display.current_selection.1,
+        }];
+
+        let mut writer = csv::Writer::from_path(DISPLAY_DB_FILE_NAME).unwrap();
+
+        for record in records.into_iter() {
+            writer.serialize(record).unwrap();
+        }
+        writer.flush().unwrap();
+
+        Ok(())
+    }
 }
 
 fn display_model_from_db(d: DBDisplay) -> models::Display {
