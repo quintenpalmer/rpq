@@ -110,7 +110,7 @@ impl DB {
         let mut records = self.read_db_displays()?;
         let max_id = records
             .iter()
-            .fold(1, |acc, display| std::cmp::max(acc, display.id));
+            .fold(0, |acc, display| std::cmp::max(acc, display.id));
 
         records.push(DBDisplay {
             id: max_id + 1,
