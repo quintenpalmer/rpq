@@ -27,6 +27,7 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         (&Method::GET, []) => index_response(),
 
         (&Method::GET, ["displays"]) => displays_response(),
+        (&Method::POST, ["displays"]) => displays_create_response(),
         (&Method::GET, ["displays", display_id]) => display_response(display_id),
 
         (&Method::POST, ["displays", display_id, "cursor", direction]) => {
@@ -55,6 +56,16 @@ fn displays_response() -> Result<Response<Body>, hyper::Error> {
     Ok(Response::new(Body::from(html::render_page(
         html::displays(displays),
     ))))
+}
+
+fn displays_create_response() -> Result<Response<Body>, hyper::Error> {
+    let db = db::DB::new();
+    match db.add_display() {
+        Ok(()) => (),
+        Err(e) => return internal_server_error(e),
+    };
+
+    displays_response()
 }
 
 fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error> {

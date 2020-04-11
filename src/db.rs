@@ -73,6 +73,21 @@ impl DB {
         Ok(records)
     }
 
+    pub fn add_display(&self) -> Result<(), String> {
+        let mut records = self.read_db_displays()?;
+        let max_id = records
+            .iter()
+            .fold(1, |acc, display| std::cmp::max(acc, display.id));
+
+        records.push(DBDisplay {
+            id: max_id + 1,
+            cursor_x: 0,
+            cursor_y: 0,
+        });
+
+        self.write_db_displays(records)
+    }
+
     pub fn update_display_cursor(&self, id: u32, cursor: (u32, u32)) -> Result<(), String> {
         let records = self
             .read_db_displays()?

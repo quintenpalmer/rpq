@@ -272,6 +272,21 @@ pub fn displays<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
                 )
                 .into_element()
             })
+            .chain(
+                vec![elements::Form {
+                    formmethod: attributes::Formmethod {
+                        inner: units::FormmethodValue::Post,
+                    },
+                    action: Some(attributes::Action {
+                        value: units::SourceValue::new("/displays".into()),
+                    }),
+                    inputs: Vec::new(),
+                    button: elements::Button::style_less(htmldsl::text("add map display".into())),
+                    styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+                }
+                .into_element()]
+                .into_iter(),
+            )
             .collect(),
     )
 }
