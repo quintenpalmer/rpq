@@ -39,6 +39,12 @@ pub enum Terrain {
 }
 
 impl Terrain {
+    pub fn all_values() -> Vec<Self> {
+        vec![Terrain::Grass, Terrain::Dirt, Terrain::Rock]
+    }
+}
+
+impl Terrain {
     pub fn display_string(&self) -> String {
         match self {
             Terrain::Grass => "Grass",
@@ -54,6 +60,12 @@ pub enum Character {
     Knight,
     Mage,
     Thief,
+}
+
+impl Character {
+    pub fn all_values() -> Vec<Self> {
+        vec![Character::Knight, Character::Mage, Character::Thief]
+    }
 }
 
 impl Character {

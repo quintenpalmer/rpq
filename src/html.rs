@@ -187,28 +187,42 @@ impl models::Map {
 }
 
 impl models::Display {
-    fn into_html(&self) -> htmldsl::Element {
+    fn into_html(&self, edit: bool) -> htmldsl::Element {
         let (terrain, o_character) = self.map.at(&self.current_selection);
 
         let hover_info = elements::Div::style_less(vec![
-            elements::P::style_less(vec![
-                terrain.clone().into_html().into_element(),
-                htmldsl::text("Terrain: ".into()),
-                htmldsl::text(terrain.display_string()),
-            ])
+            elements::P::style_less(maybe_append(
+                vec![
+                    terrain.clone().into_html().into_element(),
+                    htmldsl::text("Terrain: ".into()),
+                    htmldsl::text(terrain.display_string()),
+                ],
+                if edit {
+                    Some(build_terrain_adding_buttons().into_element())
+                } else {
+                    None
+                },
+            ))
             .into_element(),
-            elements::P::style_less(vec![
-                o_character
-                    .clone()
-                    .map_or(current_selection_marker().into_element(), |x| {
-                        x.into_html().into_element()
+            elements::P::style_less(maybe_append(
+                vec![
+                    o_character
+                        .clone()
+                        .map_or(current_selection_marker().into_element(), |x| {
+                            x.into_html().into_element()
+                        }),
+                    htmldsl::text("Character: ".into()),
+                    htmldsl::text(match o_character {
+                        Some(v) => v.display_string(),
+                        None => "--".into(),
                     }),
-                htmldsl::text("Character: ".into()),
-                htmldsl::text(match o_character {
-                    Some(v) => v.display_string(),
-                    None => "--".into(),
-                }),
-            ])
+                ],
+                if edit {
+                    Some(build_character_adding_buttons().into_element())
+                } else {
+                    None
+                },
+            ))
             .into_element(),
         ])
         .add_style(vec![
@@ -237,6 +251,24 @@ impl models::Display {
         ])
         .into_element()
     }
+}
+
+fn build_terrain_adding_buttons<'a>() -> elements::Div<'a> {
+    elements::Div::style_less(
+        models::Terrain::all_values()
+            .into_iter()
+            .map(|x| x.into_html().into_element())
+            .collect(),
+    )
+}
+
+fn build_character_adding_buttons<'a>() -> elements::Div<'a> {
+    elements::Div::style_less(
+        models::Character::all_values()
+            .into_iter()
+            .map(|x| x.into_html().into_element())
+            .collect(),
+    )
 }
 
 fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
@@ -313,7 +345,7 @@ pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
             .into_element(),
         ])
         .into_element(),
-        display.into_html(),
+        display.into_html(false),
         cursor_form_button(display.id, models::Direction::Left),
         cursor_form_button(display.id, models::Direction::Up),
         cursor_form_button(display.id, models::Direction::Down),
@@ -342,7 +374,7 @@ pub fn edit_display<'a>(display: models::Display) -> elements::Body<'a> {
             .into_element(),
         ])
         .into_element(),
-        display.into_html(),
+        display.into_html(true),
         cursor_form_button(display.id, models::Direction::Left),
         cursor_form_button(display.id, models::Direction::Up),
         cursor_form_button(display.id, models::Direction::Down),
