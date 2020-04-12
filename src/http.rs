@@ -140,7 +140,7 @@ fn edit_display_set_value(
     };
 
     match match value_type {
-        TerrainOrCharacter::Terrain => db.update_display_terrain(
+        TerrainOrCharacter::Terrain => db.update_game_terrain(
             game_id,
             match models::Terrain::parse_str(value_value) {
                 Some(v) => v,

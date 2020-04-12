@@ -249,7 +249,7 @@ impl DB {
         Ok(records)
     }
 
-    pub fn update_display_terrain(
+    pub fn update_game_terrain(
         &self,
         game_id: u32,
         terrain: models::Terrain,
