@@ -388,20 +388,24 @@ fn game_model_from_db(
 ) -> models::Game {
     models::Game {
         id: g.id,
-        map: models::Map {
-            id: m.id,
-            default_terrain: m.default_terrain,
-            specified_terrain: tiles
-                .into_iter()
-                .map(|tile| ((tile.x, tile.y), tile.terrain))
-                .collect::<BTreeMap<_, _>>(),
-            hint_max_x: m.hint_max_x,
-            hint_max_y: m.hint_max_y,
-        },
+        map: map_model_from_db(m, tiles),
         characters: characters
             .into_iter()
             .map(|character| ((character.x, character.y), character.character))
             .collect::<BTreeMap<_, _>>(),
         current_selection: (g.cursor_x, g.cursor_y),
+    }
+}
+
+fn map_model_from_db(m: DBMap, tiles: Vec<DBTileLine>) -> models::Map {
+    models::Map {
+        id: m.id,
+        default_terrain: m.default_terrain,
+        specified_terrain: tiles
+            .into_iter()
+            .map(|tile| ((tile.x, tile.y), tile.terrain))
+            .collect::<BTreeMap<_, _>>(),
+        hint_max_x: m.hint_max_x,
+        hint_max_y: m.hint_max_y,
     }
 }
