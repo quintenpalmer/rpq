@@ -420,7 +420,7 @@ pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
     ])
 }
 
-pub fn edit_display<'a>(game: models::Game) -> elements::Body<'a> {
+pub fn edit_game<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
         games_link(),

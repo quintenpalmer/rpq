@@ -123,7 +123,7 @@ fn edit_display_response(display_id_str: &str) -> Result<Response<Body>, hyper::
     };
 
     Ok(Response::new(Body::from(html::render_page(
-        html::edit_display(game),
+        html::edit_game(game),
     ))))
 }
 
@@ -218,7 +218,7 @@ fn move_cursor(
     };
 
     Ok(Response::new(Body::from(html::render_page(if edit {
-        html::edit_display(game)
+        html::edit_game(game)
     } else {
         html::game(game)
     }))))
