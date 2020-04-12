@@ -69,9 +69,9 @@ impl DB {
         DB { _nothing: () }
     }
 
-    pub fn get_displays(&self) -> Result<Vec<models::Game>, String> {
+    pub fn get_games(&self) -> Result<Vec<models::Game>, String> {
         Ok(self
-            .read_db_displays()?
+            .read_db_games()?
             .into_iter()
             .map(|x| {
                 let map = self.get_db_map(x.map_id)?;
@@ -83,7 +83,7 @@ impl DB {
     }
 
     pub fn get_display(&self, game_id: u32) -> Result<models::Game, String> {
-        for display in self.get_displays()?.into_iter() {
+        for display in self.get_games()?.into_iter() {
             if display.id == game_id {
                 return Ok(display);
             }
@@ -91,7 +91,7 @@ impl DB {
         return Err("could not find display with supplied id".into());
     }
 
-    fn read_db_displays(&self) -> Result<Vec<DBDisplay>, String> {
+    fn read_db_games(&self) -> Result<Vec<DBDisplay>, String> {
         let mut rdr = csv::Reader::from_reader(
             File::open(DISPLAY_DB_FILE_NAME)
                 .map_err(|e| format!("could not read from file: {:?}", e))?,
@@ -109,7 +109,7 @@ impl DB {
     pub fn add_display(&self) -> Result<(), String> {
         let map = self.add_db_map()?;
 
-        let mut records = self.read_db_displays()?;
+        let mut records = self.read_db_games()?;
         let max_id = records
             .iter()
             .fold(0, |acc, display| std::cmp::max(acc, display.id));
@@ -188,7 +188,7 @@ impl DB {
 
     pub fn update_display_cursor(&self, id: u32, cursor: (u32, u32)) -> Result<(), String> {
         let records = self
-            .read_db_displays()?
+            .read_db_games()?
             .into_iter()
             .map(|mut record| {
                 if record.id == id {

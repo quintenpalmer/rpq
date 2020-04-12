@@ -26,29 +26,29 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Serve some instructions at /
         (&Method::GET, []) => index_response(),
 
-        (&Method::GET, ["displays"]) => displays_response(),
-        (&Method::POST, ["displays"]) => displays_create_response(),
-        (&Method::GET, ["displays", game_id]) => display_response(game_id),
-        (&Method::GET, ["displays", game_id, "edit"]) => edit_display_response(game_id),
-        (&Method::POST, ["displays", game_id, "edit", "character", character_str]) => {
+        (&Method::GET, ["games"]) => games_response(),
+        (&Method::POST, ["games"]) => games_create_response(),
+        (&Method::GET, ["games", game_id]) => display_response(game_id),
+        (&Method::GET, ["games", game_id, "edit"]) => edit_display_response(game_id),
+        (&Method::POST, ["games", game_id, "edit", "character", character_str]) => {
             edit_display_set_value(game_id, TerrainOrCharacter::Character, character_str)
         }
-        (&Method::POST, ["displays", game_id, "edit", "terrain", terrain_str]) => {
+        (&Method::POST, ["games", game_id, "edit", "terrain", terrain_str]) => {
             edit_display_set_value(game_id, TerrainOrCharacter::Terrain, terrain_str)
         }
 
-        (&Method::POST, ["displays", game_id, "edit", "unset", "character"]) => {
+        (&Method::POST, ["games", game_id, "edit", "unset", "character"]) => {
             edit_display_unset_value(game_id, TerrainOrCharacter::Character)
         }
-        (&Method::POST, ["displays", game_id, "edit", "unset", "terrain"]) => {
+        (&Method::POST, ["games", game_id, "edit", "unset", "terrain"]) => {
             edit_display_unset_value(game_id, TerrainOrCharacter::Terrain)
         }
 
-        (&Method::POST, ["displays", game_id, "edit", "cursor", direction]) => {
+        (&Method::POST, ["games", game_id, "edit", "cursor", direction]) => {
             move_cursor(game_id, direction, true)
         }
 
-        (&Method::POST, ["displays", game_id, "cursor", direction]) => {
+        (&Method::POST, ["games", game_id, "cursor", direction]) => {
             move_cursor(game_id, direction, false)
         }
 
@@ -69,26 +69,26 @@ fn index_response() -> Result<Response<Body>, hyper::Error> {
     Ok(Response::new(Body::from(html::render_page(html::index()))))
 }
 
-fn displays_response() -> Result<Response<Body>, hyper::Error> {
+fn games_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
-    let displays = match db.get_displays() {
+    let games = match db.get_games() {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(
-        html::displays(displays),
-    ))))
+    Ok(Response::new(Body::from(html::render_page(html::games(
+        games,
+    )))))
 }
 
-fn displays_create_response() -> Result<Response<Body>, hyper::Error> {
+fn games_create_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
     match db.add_display() {
         Ok(()) => (),
         Err(e) => return internal_server_error(e),
     };
 
-    displays_response()
+    games_response()
 }
 
 fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error> {

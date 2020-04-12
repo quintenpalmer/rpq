@@ -263,7 +263,7 @@ fn build_terrain_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
                     },
                     action: Some(attributes::Action {
                         value: units::SourceValue::new(format!(
-                            "/displays/{}/edit/terrain/{}",
+                            "/games/{}/edit/terrain/{}",
                             game_id,
                             x.url_frag_string()
                         )),
@@ -281,7 +281,7 @@ fn build_terrain_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
                     },
                     action: Some(attributes::Action {
                         value: units::SourceValue::new(format!(
-                            "/displays/{}/edit/unset/terrain",
+                            "/games/{}/edit/unset/terrain",
                             game_id,
                         )),
                     }),
@@ -307,7 +307,7 @@ fn build_character_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
                     },
                     action: Some(attributes::Action {
                         value: units::SourceValue::new(format!(
-                            "/displays/{}/edit/character/{}",
+                            "/games/{}/edit/character/{}",
                             game_id,
                             x.url_frag_string()
                         )),
@@ -325,7 +325,7 @@ fn build_character_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
                     },
                     action: Some(attributes::Action {
                         value: units::SourceValue::new(format!(
-                            "/displays/{}/edit/unset/character",
+                            "/games/{}/edit/unset/character",
                             game_id,
                         )),
                     }),
@@ -351,20 +351,20 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
 }
 
 pub fn index<'a>() -> elements::Body<'a> {
-    elements::Body::style_less(vec![index_link(), displays_link()])
+    elements::Body::style_less(vec![index_link(), games_link()])
 }
 
-pub fn displays<'a>(displays: Vec<models::Game>) -> elements::Body<'a> {
+pub fn games<'a>(games: Vec<models::Game>) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
-        displays_link(),
+        games_link(),
         elements::Div::style_less(
-            displays
+            games
                 .into_iter()
                 .map(|game| {
                     elements::A::style_less(
                         attributes::Href {
-                            value: units::SourceValue::new(format!("/displays/{}", game.id)),
+                            value: units::SourceValue::new(format!("/games/{}", game.id)),
                         },
                         vec![htmldsl::text(format!("game: {}", game.id))],
                     )
@@ -376,7 +376,7 @@ pub fn displays<'a>(displays: Vec<models::Game>) -> elements::Body<'a> {
                             inner: units::FormmethodValue::Post,
                         },
                         action: Some(attributes::Action {
-                            value: units::SourceValue::new("/displays".into()),
+                            value: units::SourceValue::new("/games".into()),
                         }),
                         inputs: Vec::new(),
                         button: elements::Button::style_less(htmldsl::text("add map game".into())),
@@ -394,18 +394,18 @@ pub fn displays<'a>(displays: Vec<models::Game>) -> elements::Body<'a> {
 pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
-        displays_link(),
+        games_link(),
         elements::H3::style_less(vec![
             elements::A::style_less(
                 attributes::Href {
-                    value: units::SourceValue::new(format!("/displays/{}", game.id)),
+                    value: units::SourceValue::new(format!("/games/{}", game.id)),
                 },
                 vec![htmldsl::text("this map".into())],
             )
             .into_element(),
             elements::A::style_less(
                 attributes::Href {
-                    value: units::SourceValue::new(format!("/displays/{}/edit", game.id)),
+                    value: units::SourceValue::new(format!("/games/{}/edit", game.id)),
                 },
                 vec![htmldsl::text("edit".into())],
             )
@@ -423,18 +423,18 @@ pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
 pub fn edit_display<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
-        displays_link(),
+        games_link(),
         elements::H3::style_less(vec![
             elements::A::style_less(
                 attributes::Href {
-                    value: units::SourceValue::new(format!("/displays/{}", game.id)),
+                    value: units::SourceValue::new(format!("/games/{}", game.id)),
                 },
                 vec![htmldsl::text("view map".into())],
             )
             .into_element(),
             elements::A::style_less(
                 attributes::Href {
-                    value: units::SourceValue::new(format!("/displays/{}/edit", game.id)),
+                    value: units::SourceValue::new(format!("/games/{}/edit", game.id)),
                 },
                 vec![htmldsl::text("editing".into())],
             )
@@ -457,9 +457,9 @@ fn cursor_form_button(game_id: u32, dir: models::Direction, edit: bool) -> htmld
         },
         action: Some(attributes::Action {
             value: units::SourceValue::new(if edit {
-                format!("/displays/{}/edit/cursor/{}", game_id, url_frag)
+                format!("/games/{}/edit/cursor/{}", game_id, url_frag)
             } else {
-                format!("/displays/{}/cursor/{}", game_id, url_frag)
+                format!("/games/{}/cursor/{}", game_id, url_frag)
             }),
         }),
         inputs: Vec::new(),
@@ -480,12 +480,12 @@ fn index_link() -> htmldsl::Element {
     .into_element()
 }
 
-fn displays_link() -> htmldsl::Element {
+fn games_link() -> htmldsl::Element {
     elements::H2::style_less(vec![elements::A::style_less(
         attributes::Href {
-            value: units::SourceValue::new("/displays".into()),
+            value: units::SourceValue::new("/games".into()),
         },
-        vec![htmldsl::text("displays".into())],
+        vec![htmldsl::text("games".into())],
     )
     .into_element()])
     .into_element()
