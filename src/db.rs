@@ -5,13 +5,13 @@ use serde::{Deserialize, Serialize};
 
 use super::models;
 
-const DISPLAY_DB_FILE_NAME: &'static str = "db/game.csv";
+const GAME_DB_FILE_NAME: &'static str = "db/game.csv";
 const MAP_DB_FILE_NAME: &'static str = "db/map.csv";
 const TILES_DB_FILE_NAME: &'static str = "db/tiles.csv";
 const CHARACTER_DB_FILE_NAME: &'static str = "db/characters.csv";
 
 const ALL_DB_FILE_NAMES: &'static [&'static str] = &[
-    DISPLAY_DB_FILE_NAME,
+    GAME_DB_FILE_NAME,
     MAP_DB_FILE_NAME,
     TILES_DB_FILE_NAME,
     CHARACTER_DB_FILE_NAME,
@@ -93,7 +93,7 @@ impl DB {
 
     fn read_db_games(&self) -> Result<Vec<DBDisplay>, String> {
         let mut rdr = csv::Reader::from_reader(
-            File::open(DISPLAY_DB_FILE_NAME)
+            File::open(GAME_DB_FILE_NAME)
                 .map_err(|e| format!("could not read from file: {:?}", e))?,
         );
         let records = rdr
@@ -121,7 +121,7 @@ impl DB {
             cursor_y: 0,
         });
 
-        self.write_replace_records(DISPLAY_DB_FILE_NAME, records)
+        self.write_replace_records(GAME_DB_FILE_NAME, records)
     }
 
     fn add_db_map(&self) -> Result<DBMap, String> {
@@ -200,7 +200,7 @@ impl DB {
                 }
             })
             .collect();
-        self.write_replace_records(DISPLAY_DB_FILE_NAME, records)
+        self.write_replace_records(GAME_DB_FILE_NAME, records)
     }
 
     fn read_db_tile_lines_for_map_id(&self, map_id: u32) -> Result<Vec<DBTileLine>, String> {
