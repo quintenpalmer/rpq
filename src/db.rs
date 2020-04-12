@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use super::models;
 
-const DISPLAY_DB_FILE_NAME: &'static str = "db/display.csv";
+const DISPLAY_DB_FILE_NAME: &'static str = "db/game.csv";
 const MAP_DB_FILE_NAME: &'static str = "db/map.csv";
 const TILES_DB_FILE_NAME: &'static str = "db/tiles.csv";
 const CHARACTER_DB_FILE_NAME: &'static str = "db/characters.csv";
@@ -83,12 +83,12 @@ impl DB {
     }
 
     pub fn get_game(&self, game_id: u32) -> Result<models::Game, String> {
-        for display in self.get_games()?.into_iter() {
-            if display.id == game_id {
-                return Ok(display);
+        for game in self.get_games()?.into_iter() {
+            if game.id == game_id {
+                return Ok(game);
             }
         }
-        return Err("could not find display with supplied id".into());
+        return Err("could not find game with supplied id".into());
     }
 
     fn read_db_games(&self) -> Result<Vec<DBDisplay>, String> {
@@ -100,7 +100,7 @@ impl DB {
             .deserialize()
             .into_iter()
             .map(|result| -> Result<DBDisplay, String> {
-                result.map_err(|e| format!("could not read row for display: {:?}", e))
+                result.map_err(|e| format!("could not read row for game: {:?}", e))
             })
             .collect::<Result<Vec<DBDisplay>, String>>()?;
         Ok(records)
@@ -112,7 +112,7 @@ impl DB {
         let mut records = self.read_db_games()?;
         let max_id = records
             .iter()
-            .fold(0, |acc, display| std::cmp::max(acc, display.id));
+            .fold(0, |acc, game| std::cmp::max(acc, game.id));
 
         records.push(DBDisplay {
             id: max_id + 1,
@@ -162,7 +162,7 @@ impl DB {
             .deserialize()
             .into_iter()
             .map(|result| -> Result<DBMap, String> {
-                result.map_err(|e| format!("could not read row for display: {:?}", e))
+                result.map_err(|e| format!("could not read row for game: {:?}", e))
             })
             .collect::<Result<Vec<DBMap>, String>>()?;
         Ok(records)
@@ -259,14 +259,14 @@ impl DB {
             .iter()
             .fold(0, |acc, record| std::cmp::max(acc, record.id));
 
-        let display = self.get_game(game_id)?;
+        let game = self.get_game(game_id)?;
 
         let new_record = DBTileLine {
             id: max_id + 1,
-            map_id: display.map.id,
+            map_id: game.map.id,
             terrain: terrain,
-            x: display.current_selection.0,
-            y: display.current_selection.1,
+            x: game.current_selection.0,
+            y: game.current_selection.1,
         };
 
         records.push(new_record.clone());
@@ -305,14 +305,14 @@ impl DB {
             .iter()
             .fold(0, |acc, record| std::cmp::max(acc, record.id));
 
-        let display = self.get_game(game_id)?;
+        let game = self.get_game(game_id)?;
 
         let new_record = DBCharacter {
             id: max_id + 1,
-            map_id: display.map.id,
+            map_id: game.map.id,
             character: character,
-            x: display.current_selection.0,
-            y: display.current_selection.1,
+            x: game.current_selection.0,
+            y: game.current_selection.1,
         };
 
         records.push(new_record.clone());
@@ -344,14 +344,14 @@ impl DB {
     pub fn unset_display_terrain(&self, game_id: u32) -> Result<(), String> {
         let mut records = self.read_db_tile_lines()?;
 
-        let display = self.get_game(game_id)?;
+        let game = self.get_game(game_id)?;
 
         records = records
             .into_iter()
             .filter(|record| {
-                !((record.map_id == display.map.id)
-                    && (record.x == display.current_selection.0)
-                    && (record.y == display.current_selection.1))
+                !((record.map_id == game.map.id)
+                    && (record.x == game.current_selection.0)
+                    && (record.y == game.current_selection.1))
             })
             .collect();
 
@@ -363,14 +363,14 @@ impl DB {
     pub fn unset_display_character(&self, game_id: u32) -> Result<(), String> {
         let mut records = self.read_db_characters()?;
 
-        let display = self.get_game(game_id)?;
+        let game = self.get_game(game_id)?;
 
         records = records
             .into_iter()
             .filter(|record| {
-                !((record.map_id == display.map.id)
-                    && (record.x == display.current_selection.0)
-                    && (record.y == display.current_selection.1))
+                !((record.map_id == game.map.id)
+                    && (record.x == game.current_selection.0)
+                    && (record.y == game.current_selection.1))
             })
             .collect();
 
