@@ -271,6 +271,25 @@ impl DB {
 
         records.push(new_record.clone());
 
+        records = records
+            .into_iter()
+            .map(|record| {
+                (
+                    (record.map_id, record.x, record.y),
+                    (record.id, record.terrain),
+                )
+            })
+            .collect::<BTreeMap<_, _>>()
+            .into_iter()
+            .map(|(key, value)| DBTileLine {
+                id: value.0,
+                map_id: key.0,
+                terrain: value.1,
+                x: key.1,
+                y: key.2,
+            })
+            .collect::<Vec<DBTileLine>>();
+
         self.write_replace_records(TILES_DB_FILE_NAME, records)?;
 
         Ok(())
