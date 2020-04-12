@@ -37,8 +37,12 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
             edit_display_set_value(display_id, TerrainOrCharacter::Terrain, terrain_str)
         }
 
+        (&Method::POST, ["displays", display_id, "edit", "cursor", direction]) => {
+            move_cursor(display_id, direction, true)
+        }
+
         (&Method::POST, ["displays", display_id, "cursor", direction]) => {
-            move_cursor(display_id, direction)
+            move_cursor(display_id, direction, false)
         }
 
         // Serve hard-coded images
@@ -153,7 +157,11 @@ fn edit_display_set_value(
     edit_display_response(display_id_str)
 }
 
-fn move_cursor(display_id_str: &str, direction_str: &str) -> Result<Response<Body>, hyper::Error> {
+fn move_cursor(
+    display_id_str: &str,
+    direction_str: &str,
+    edit: bool,
+) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
     let display_id = match display_id_str.parse::<u32>() {
