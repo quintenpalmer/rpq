@@ -212,7 +212,7 @@ fn move_cursor(
 
     game.move_cursor(direction);
 
-    match db.update_display_cursor(game.id, game.current_selection) {
+    match db.update_game_cursor(game.id, game.current_selection) {
         Ok(()) => (),
         Err(e) => return internal_server_error(e),
     };

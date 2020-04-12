@@ -186,7 +186,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn update_display_cursor(&self, id: u32, cursor: (u32, u32)) -> Result<(), String> {
+    pub fn update_game_cursor(&self, id: u32, cursor: (u32, u32)) -> Result<(), String> {
         let records = self
             .read_db_games()?
             .into_iter()
