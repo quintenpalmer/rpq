@@ -28,20 +28,20 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 
         (&Method::GET, ["games"]) => games_response(),
         (&Method::POST, ["games"]) => games_create_response(),
-        (&Method::GET, ["games", game_id]) => display_response(game_id),
-        (&Method::GET, ["games", game_id, "edit"]) => edit_display_response(game_id),
+        (&Method::GET, ["games", game_id]) => game_response(game_id),
+        (&Method::GET, ["games", game_id, "edit"]) => edit_game_response(game_id),
         (&Method::POST, ["games", game_id, "edit", "character", character_str]) => {
-            edit_display_set_value(game_id, TerrainOrCharacter::Character, character_str)
+            edit_game_set_value(game_id, TerrainOrCharacter::Character, character_str)
         }
         (&Method::POST, ["games", game_id, "edit", "terrain", terrain_str]) => {
-            edit_display_set_value(game_id, TerrainOrCharacter::Terrain, terrain_str)
+            edit_game_set_value(game_id, TerrainOrCharacter::Terrain, terrain_str)
         }
 
         (&Method::POST, ["games", game_id, "edit", "unset", "character"]) => {
-            edit_display_unset_value(game_id, TerrainOrCharacter::Character)
+            edit_game_unset_value(game_id, TerrainOrCharacter::Character)
         }
         (&Method::POST, ["games", game_id, "edit", "unset", "terrain"]) => {
-            edit_display_unset_value(game_id, TerrainOrCharacter::Terrain)
+            edit_game_unset_value(game_id, TerrainOrCharacter::Terrain)
         }
 
         (&Method::POST, ["games", game_id, "edit", "cursor", direction]) => {
@@ -91,7 +91,7 @@ fn games_create_response() -> Result<Response<Body>, hyper::Error> {
     games_response()
 }
 
-fn display_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
+fn game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
     let game_id = match game_id_str.parse::<u32>() {
@@ -109,7 +109,7 @@ fn display_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     )))))
 }
 
-fn edit_display_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
+fn edit_game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
     let game_id = match game_id_str.parse::<u32>() {
@@ -127,7 +127,7 @@ fn edit_display_response(game_id_str: &str) -> Result<Response<Body>, hyper::Err
     ))))
 }
 
-fn edit_display_set_value(
+fn edit_game_set_value(
     game_id_str: &str,
     value_type: TerrainOrCharacter,
     value_value: &str,
@@ -161,10 +161,10 @@ fn edit_display_set_value(
         }
     };
 
-    edit_display_response(game_id_str)
+    edit_game_response(game_id_str)
 }
 
-fn edit_display_unset_value(
+fn edit_game_unset_value(
     game_id_str: &str,
     value_type: TerrainOrCharacter,
 ) -> Result<Response<Body>, hyper::Error> {
@@ -185,7 +185,7 @@ fn edit_display_unset_value(
         }
     };
 
-    edit_display_response(game_id_str)
+    edit_game_response(game_id_str)
 }
 
 fn move_cursor(
