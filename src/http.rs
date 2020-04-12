@@ -147,7 +147,7 @@ fn edit_display_set_value(
                 None => return bad_request_response("terrain in path invalid"),
             },
         ),
-        TerrainOrCharacter::Character => db.update_display_character(
+        TerrainOrCharacter::Character => db.update_game_character(
             game_id,
             match models::Character::parse_str(value_value) {
                 Some(v) => v,

@@ -295,7 +295,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn update_display_character(
+    pub fn update_game_character(
         &self,
         game_id: u32,
         character: models::Character,
