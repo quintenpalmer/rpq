@@ -127,7 +127,7 @@ fn game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
 
     let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
-        Err(_e) => return bad_request_response("must supply map id as u32"),
+        Err(_e) => return bad_request_response("must supply game id as u32"),
     };
 
     let game = match db.get_game(game_id) {
