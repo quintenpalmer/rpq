@@ -18,7 +18,7 @@ const ALL_DB_FILE_NAMES: &'static [&'static str] = &[
 ];
 
 #[derive(Serialize, Deserialize, Clone)]
-struct DBDisplay {
+struct DBGame {
     id: u32,
     map_id: u32,
     cursor_x: u32,
@@ -91,7 +91,7 @@ impl DB {
         return Err("could not find game with supplied id".into());
     }
 
-    fn read_db_games(&self) -> Result<Vec<DBDisplay>, String> {
+    fn read_db_games(&self) -> Result<Vec<DBGame>, String> {
         let mut rdr = csv::Reader::from_reader(
             File::open(GAME_DB_FILE_NAME)
                 .map_err(|e| format!("could not read from file: {:?}", e))?,
@@ -99,10 +99,10 @@ impl DB {
         let records = rdr
             .deserialize()
             .into_iter()
-            .map(|result| -> Result<DBDisplay, String> {
+            .map(|result| -> Result<DBGame, String> {
                 result.map_err(|e| format!("could not read row for game: {:?}", e))
             })
-            .collect::<Result<Vec<DBDisplay>, String>>()?;
+            .collect::<Result<Vec<DBGame>, String>>()?;
         Ok(records)
     }
 
@@ -114,7 +114,7 @@ impl DB {
             .iter()
             .fold(0, |acc, game| std::cmp::max(acc, game.id));
 
-        records.push(DBDisplay {
+        records.push(DBGame {
             id: max_id + 1,
             map_id: map.id,
             cursor_x: 0,
@@ -381,7 +381,7 @@ impl DB {
 }
 
 fn game_model_from_db(
-    d: DBDisplay,
+    d: DBGame,
     m: DBMap,
     tiles: Vec<DBTileLine>,
     characters: Vec<DBCharacter>,
