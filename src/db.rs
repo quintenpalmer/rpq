@@ -35,6 +35,7 @@ struct DBMap {
 
 #[derive(Serialize, Deserialize, Clone)]
 struct DBTileLine {
+    id: u32,
     map_id: u32,
     terrain: models::Terrain,
     x: u32,
@@ -43,6 +44,7 @@ struct DBTileLine {
 
 #[derive(Serialize, Deserialize, Clone)]
 struct DBCharacter {
+    id: u32,
     map_id: u32,
     character: models::Character,
     x: u32,
