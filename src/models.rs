@@ -142,13 +142,13 @@ impl Map {
     }
 }
 
-pub struct Display {
+pub struct Game {
     pub id: u32,
     pub map: Map,
     pub current_selection: (u32, u32),
 }
 
-impl Display {
+impl Game {
     pub fn move_cursor(&mut self, direction: Direction) {
         let (max_x, max_y) = self.map.maxes();
         match direction {

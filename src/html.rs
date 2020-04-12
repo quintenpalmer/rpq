@@ -182,7 +182,7 @@ impl models::Map {
     }
 }
 
-impl models::Display {
+impl models::Game {
     fn into_html(&self, edit: bool) -> htmldsl::Element {
         let (terrain, o_character) = self.map.at(&self.current_selection);
 
@@ -354,7 +354,7 @@ pub fn index<'a>() -> elements::Body<'a> {
     elements::Body::style_less(vec![index_link(), displays_link()])
 }
 
-pub fn displays<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
+pub fn displays<'a>(displays: Vec<models::Game>) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
         displays_link(),
@@ -393,7 +393,7 @@ pub fn displays<'a>(displays: Vec<models::Display>) -> elements::Body<'a> {
     ])
 }
 
-pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
+pub fn display<'a>(display: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
         displays_link(),
@@ -422,7 +422,7 @@ pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
     ])
 }
 
-pub fn edit_display<'a>(display: models::Display) -> elements::Body<'a> {
+pub fn edit_display<'a>(display: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
         displays_link(),

@@ -69,7 +69,7 @@ impl DB {
         DB { _nothing: () }
     }
 
-    pub fn get_displays(&self) -> Result<Vec<models::Display>, String> {
+    pub fn get_displays(&self) -> Result<Vec<models::Game>, String> {
         Ok(self
             .read_db_displays()?
             .into_iter()
@@ -79,10 +79,10 @@ impl DB {
                 let characters = self.read_db_characters_for_map_id(map.id)?;
                 Ok(display_model_from_db(x, map, tiles, characters))
             })
-            .collect::<Result<Vec<models::Display>, String>>()?)
+            .collect::<Result<Vec<models::Game>, String>>()?)
     }
 
-    pub fn get_display(&self, display_id: u32) -> Result<models::Display, String> {
+    pub fn get_display(&self, display_id: u32) -> Result<models::Game, String> {
         for display in self.get_displays()?.into_iter() {
             if display.id == display_id {
                 return Ok(display);
@@ -385,8 +385,8 @@ fn display_model_from_db(
     m: DBMap,
     tiles: Vec<DBTileLine>,
     characters: Vec<DBCharacter>,
-) -> models::Display {
-    models::Display {
+) -> models::Game {
+    models::Game {
         id: d.id,
         map: models::Map {
             id: m.id,
