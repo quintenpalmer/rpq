@@ -44,9 +44,6 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
                                     0,
                                     units::Length::Pixel,
                                 )),
-                                &styles::VerticalAlign {
-                                    value: units::VerticalAlignValue::Baseline,
-                                },
                             ],
                         },
                         style_sheet::StyleAssignment {
