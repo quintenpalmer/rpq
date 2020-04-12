@@ -28,28 +28,28 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 
         (&Method::GET, ["displays"]) => displays_response(),
         (&Method::POST, ["displays"]) => displays_create_response(),
-        (&Method::GET, ["displays", display_id]) => display_response(display_id),
-        (&Method::GET, ["displays", display_id, "edit"]) => edit_display_response(display_id),
-        (&Method::POST, ["displays", display_id, "edit", "character", character_str]) => {
-            edit_display_set_value(display_id, TerrainOrCharacter::Character, character_str)
+        (&Method::GET, ["displays", game_id]) => display_response(game_id),
+        (&Method::GET, ["displays", game_id, "edit"]) => edit_display_response(game_id),
+        (&Method::POST, ["displays", game_id, "edit", "character", character_str]) => {
+            edit_display_set_value(game_id, TerrainOrCharacter::Character, character_str)
         }
-        (&Method::POST, ["displays", display_id, "edit", "terrain", terrain_str]) => {
-            edit_display_set_value(display_id, TerrainOrCharacter::Terrain, terrain_str)
-        }
-
-        (&Method::POST, ["displays", display_id, "edit", "unset", "character"]) => {
-            edit_display_unset_value(display_id, TerrainOrCharacter::Character)
-        }
-        (&Method::POST, ["displays", display_id, "edit", "unset", "terrain"]) => {
-            edit_display_unset_value(display_id, TerrainOrCharacter::Terrain)
+        (&Method::POST, ["displays", game_id, "edit", "terrain", terrain_str]) => {
+            edit_display_set_value(game_id, TerrainOrCharacter::Terrain, terrain_str)
         }
 
-        (&Method::POST, ["displays", display_id, "edit", "cursor", direction]) => {
-            move_cursor(display_id, direction, true)
+        (&Method::POST, ["displays", game_id, "edit", "unset", "character"]) => {
+            edit_display_unset_value(game_id, TerrainOrCharacter::Character)
+        }
+        (&Method::POST, ["displays", game_id, "edit", "unset", "terrain"]) => {
+            edit_display_unset_value(game_id, TerrainOrCharacter::Terrain)
         }
 
-        (&Method::POST, ["displays", display_id, "cursor", direction]) => {
-            move_cursor(display_id, direction, false)
+        (&Method::POST, ["displays", game_id, "edit", "cursor", direction]) => {
+            move_cursor(game_id, direction, true)
+        }
+
+        (&Method::POST, ["displays", game_id, "cursor", direction]) => {
+            move_cursor(game_id, direction, false)
         }
 
         // Serve hard-coded images
@@ -94,12 +94,12 @@ fn displays_create_response() -> Result<Response<Body>, hyper::Error> {
 fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let display_id = match display_id_str.parse::<u32>() {
+    let game_id = match display_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let display = match db.get_display(display_id) {
+    let display = match db.get_display(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
@@ -112,12 +112,12 @@ fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error
 fn edit_display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let display_id = match display_id_str.parse::<u32>() {
+    let game_id = match display_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let display = match db.get_display(display_id) {
+    let display = match db.get_display(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
@@ -134,21 +134,21 @@ fn edit_display_set_value(
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let display_id = match display_id_str.parse::<u32>() {
+    let game_id = match display_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
     match match value_type {
         TerrainOrCharacter::Terrain => db.update_display_terrain(
-            display_id,
+            game_id,
             match models::Terrain::parse_str(value_value) {
                 Some(v) => v,
                 None => return bad_request_response("terrain in path invalid"),
             },
         ),
         TerrainOrCharacter::Character => db.update_display_character(
-            display_id,
+            game_id,
             match models::Character::parse_str(value_value) {
                 Some(v) => v,
                 None => return bad_request_response("character in path invalid"),
@@ -170,14 +170,14 @@ fn edit_display_unset_value(
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let display_id = match display_id_str.parse::<u32>() {
+    let game_id = match display_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
     match match value_type {
-        TerrainOrCharacter::Terrain => db.unset_display_terrain(display_id),
-        TerrainOrCharacter::Character => db.unset_display_character(display_id),
+        TerrainOrCharacter::Terrain => db.unset_display_terrain(game_id),
+        TerrainOrCharacter::Character => db.unset_display_character(game_id),
     } {
         Ok(()) => (),
         Err(e) => {
@@ -195,12 +195,12 @@ fn move_cursor(
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let display_id = match display_id_str.parse::<u32>() {
+    let game_id = match display_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let mut display = match db.get_display(display_id) {
+    let mut display = match db.get_display(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };

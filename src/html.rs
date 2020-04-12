@@ -252,7 +252,7 @@ impl models::Game {
     }
 }
 
-fn build_terrain_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
+fn build_terrain_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
     elements::Div::style_less(
         models::Terrain::all_values()
             .into_iter()
@@ -264,7 +264,7 @@ fn build_terrain_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
                     action: Some(attributes::Action {
                         value: units::SourceValue::new(format!(
                             "/displays/{}/edit/terrain/{}",
-                            display_id,
+                            game_id,
                             x.url_frag_string()
                         )),
                     }),
@@ -282,7 +282,7 @@ fn build_terrain_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
                     action: Some(attributes::Action {
                         value: units::SourceValue::new(format!(
                             "/displays/{}/edit/unset/terrain",
-                            display_id,
+                            game_id,
                         )),
                     }),
                     inputs: Vec::new(),
@@ -296,7 +296,7 @@ fn build_terrain_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
     )
 }
 
-fn build_character_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
+fn build_character_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
     elements::Div::style_less(
         models::Character::all_values()
             .into_iter()
@@ -308,7 +308,7 @@ fn build_character_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
                     action: Some(attributes::Action {
                         value: units::SourceValue::new(format!(
                             "/displays/{}/edit/character/{}",
-                            display_id,
+                            game_id,
                             x.url_frag_string()
                         )),
                     }),
@@ -326,7 +326,7 @@ fn build_character_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
                     action: Some(attributes::Action {
                         value: units::SourceValue::new(format!(
                             "/displays/{}/edit/unset/character",
-                            display_id,
+                            game_id,
                         )),
                     }),
                     inputs: Vec::new(),
@@ -451,7 +451,7 @@ pub fn edit_display<'a>(display: models::Game) -> elements::Body<'a> {
     ])
 }
 
-fn cursor_form_button(display_id: u32, dir: models::Direction, edit: bool) -> htmldsl::Element {
+fn cursor_form_button(game_id: u32, dir: models::Direction, edit: bool) -> htmldsl::Element {
     let (url_frag, symbol) = dir.form_strings();
     elements::Form {
         formmethod: attributes::Formmethod {
@@ -459,9 +459,9 @@ fn cursor_form_button(display_id: u32, dir: models::Direction, edit: bool) -> ht
         },
         action: Some(attributes::Action {
             value: units::SourceValue::new(if edit {
-                format!("/displays/{}/edit/cursor/{}", display_id, url_frag)
+                format!("/displays/{}/edit/cursor/{}", game_id, url_frag)
             } else {
-                format!("/displays/{}/cursor/{}", display_id, url_frag)
+                format!("/displays/{}/cursor/{}", game_id, url_frag)
             }),
         }),
         inputs: Vec::new(),

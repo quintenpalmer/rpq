@@ -82,9 +82,9 @@ impl DB {
             .collect::<Result<Vec<models::Game>, String>>()?)
     }
 
-    pub fn get_display(&self, display_id: u32) -> Result<models::Game, String> {
+    pub fn get_display(&self, game_id: u32) -> Result<models::Game, String> {
         for display in self.get_displays()?.into_iter() {
-            if display.id == display_id {
+            if display.id == game_id {
                 return Ok(display);
             }
         }
@@ -251,7 +251,7 @@ impl DB {
 
     pub fn update_display_terrain(
         &self,
-        display_id: u32,
+        game_id: u32,
         terrain: models::Terrain,
     ) -> Result<(), String> {
         let mut records = self.read_db_tile_lines()?;
@@ -259,7 +259,7 @@ impl DB {
             .iter()
             .fold(0, |acc, record| std::cmp::max(acc, record.id));
 
-        let display = self.get_display(display_id)?;
+        let display = self.get_display(game_id)?;
 
         let new_record = DBTileLine {
             id: max_id + 1,
@@ -297,7 +297,7 @@ impl DB {
 
     pub fn update_display_character(
         &self,
-        display_id: u32,
+        game_id: u32,
         character: models::Character,
     ) -> Result<(), String> {
         let mut records = self.read_db_characters()?;
@@ -305,7 +305,7 @@ impl DB {
             .iter()
             .fold(0, |acc, record| std::cmp::max(acc, record.id));
 
-        let display = self.get_display(display_id)?;
+        let display = self.get_display(game_id)?;
 
         let new_record = DBCharacter {
             id: max_id + 1,
@@ -341,10 +341,10 @@ impl DB {
         Ok(())
     }
 
-    pub fn unset_display_terrain(&self, display_id: u32) -> Result<(), String> {
+    pub fn unset_display_terrain(&self, game_id: u32) -> Result<(), String> {
         let mut records = self.read_db_tile_lines()?;
 
-        let display = self.get_display(display_id)?;
+        let display = self.get_display(game_id)?;
 
         records = records
             .into_iter()
@@ -360,10 +360,10 @@ impl DB {
         Ok(())
     }
 
-    pub fn unset_display_character(&self, display_id: u32) -> Result<(), String> {
+    pub fn unset_display_character(&self, game_id: u32) -> Result<(), String> {
         let mut records = self.read_db_characters()?;
 
-        let display = self.get_display(display_id)?;
+        let display = self.get_display(game_id)?;
 
         records = records
             .into_iter()
