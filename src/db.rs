@@ -119,7 +119,7 @@ impl DB {
             cursor_y: 0,
         });
 
-        self.write_db_displays(records)
+        self.write_replace_records(DISPLAY_DB_FILE_NAME, records)
     }
 
     fn add_db_map(&self) -> Result<DBMap, String> {
@@ -137,7 +137,7 @@ impl DB {
 
         records.push(new_record.clone());
 
-        self.write_db_maps(records)?;
+        self.write_replace_records(MAP_DB_FILE_NAME, records)?;
 
         Ok(new_record)
     }
@@ -166,8 +166,12 @@ impl DB {
         Ok(records)
     }
 
-    fn write_db_maps(&self, records: Vec<DBMap>) -> Result<(), String> {
-        let mut writer = csv::Writer::from_path(MAP_DB_FILE_NAME).unwrap();
+    fn write_replace_records<S: Serialize>(
+        &self,
+        db_file_name: &'static str,
+        records: Vec<S>,
+    ) -> Result<(), String> {
+        let mut writer = csv::Writer::from_path(db_file_name).unwrap();
 
         for record in records.into_iter() {
             writer.serialize(record).unwrap();
@@ -194,21 +198,7 @@ impl DB {
                 }
             })
             .collect();
-        self.write_db_displays(records)
-    }
-
-    fn write_db_displays(&self, records: Vec<DBDisplay>) -> Result<(), String> {
-        let mut writer = csv::Writer::from_path(DISPLAY_DB_FILE_NAME).unwrap();
-
-        for record in records.into_iter() {
-            writer.serialize(record).unwrap();
-        }
-        match writer.flush() {
-            Ok(()) => (),
-            Err(e) => return Err(format!("error flushing: {:?}", e)),
-        };
-
-        Ok(())
+        self.write_replace_records(DISPLAY_DB_FILE_NAME, records)
     }
 
     fn read_db_tile_lines_for_map_id(&self, map_id: u32) -> Result<Vec<DBTileLine>, String> {
