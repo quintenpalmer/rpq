@@ -380,10 +380,10 @@ pub fn display<'a>(display: models::Display) -> elements::Body<'a> {
         ])
         .into_element(),
         display.into_html(false),
-        cursor_form_button(display.id, models::Direction::Left),
-        cursor_form_button(display.id, models::Direction::Up),
-        cursor_form_button(display.id, models::Direction::Down),
-        cursor_form_button(display.id, models::Direction::Right),
+        cursor_form_button(display.id, models::Direction::Left, false),
+        cursor_form_button(display.id, models::Direction::Up, false),
+        cursor_form_button(display.id, models::Direction::Down, false),
+        cursor_form_button(display.id, models::Direction::Right, false),
     ])
 }
 
@@ -409,14 +409,14 @@ pub fn edit_display<'a>(display: models::Display) -> elements::Body<'a> {
         ])
         .into_element(),
         display.into_html(true),
-        cursor_form_button(display.id, models::Direction::Left),
-        cursor_form_button(display.id, models::Direction::Up),
-        cursor_form_button(display.id, models::Direction::Down),
-        cursor_form_button(display.id, models::Direction::Right),
+        cursor_form_button(display.id, models::Direction::Left, true),
+        cursor_form_button(display.id, models::Direction::Up, true),
+        cursor_form_button(display.id, models::Direction::Down, true),
+        cursor_form_button(display.id, models::Direction::Right, true),
     ])
 }
 
-fn cursor_form_button(display_id: u32, dir: models::Direction) -> htmldsl::Element {
+fn cursor_form_button(display_id: u32, dir: models::Direction, edit: bool) -> htmldsl::Element {
     let (url_frag, symbol) = dir.form_strings();
     elements::Form {
         formmethod: attributes::Formmethod {
