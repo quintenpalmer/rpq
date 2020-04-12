@@ -181,7 +181,6 @@ impl models::Map {
                     .collect(),
             ),
         )
-        .add_style(vec![&styles::Display::Inline])
         .into_element()
     }
 }
@@ -245,10 +244,13 @@ impl models::Display {
         ])
         .into_element();
 
-        elements::Div::style_less(vec![
-            self.map.into_html(Some(self.current_selection)),
-            hover_info,
-        ])
+        elements::Table::style_less(
+            None,
+            elements::Tbody::style_less(vec![elements::Tr::style_less(vec![
+                elements::Td::style_less(vec![self.map.into_html(Some(self.current_selection))]),
+                elements::Td::style_less(vec![hover_info]),
+            ])]),
+        )
         .into_element()
     }
 }
