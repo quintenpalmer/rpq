@@ -423,7 +423,11 @@ fn cursor_form_button(display_id: u32, dir: models::Direction, edit: bool) -> ht
             inner: units::FormmethodValue::Post,
         },
         action: Some(attributes::Action {
-            value: units::SourceValue::new(format!("/displays/{}/cursor/{}", display_id, url_frag)),
+            value: units::SourceValue::new(if edit {
+                format!("/displays/{}/edit/cursor/{}", display_id, url_frag)
+            } else {
+                format!("/displays/{}/cursor/{}", display_id, url_frag)
+            }),
         }),
         inputs: Vec::new(),
         button: elements::Button::style_less(htmldsl::text(symbol.into())),
