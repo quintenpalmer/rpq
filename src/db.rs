@@ -298,8 +298,46 @@ impl DB {
     pub fn update_display_character(
         &self,
         display_id: u32,
-        terrain: models::Character,
+        character: models::Character,
     ) -> Result<(), String> {
+        let mut records = self.read_db_characters()?;
+        let max_id = records
+            .iter()
+            .fold(0, |acc, record| std::cmp::max(acc, record.id));
+
+        let display = self.get_display(display_id)?;
+
+        let new_record = DBCharacter {
+            id: max_id + 1,
+            map_id: display.map.id,
+            character: character,
+            x: display.current_selection.0,
+            y: display.current_selection.1,
+        };
+
+        records.push(new_record.clone());
+
+        records = records
+            .into_iter()
+            .map(|record| {
+                (
+                    (record.map_id, record.x, record.y),
+                    (record.id, record.character),
+                )
+            })
+            .collect::<BTreeMap<_, _>>()
+            .into_iter()
+            .map(|(key, value)| DBCharacter {
+                id: value.0,
+                map_id: key.0,
+                character: value.1,
+                x: key.1,
+                y: key.2,
+            })
+            .collect::<Vec<DBCharacter>>();
+
+        self.write_replace_records(CHARACTER_DB_FILE_NAME, records)?;
+
         Ok(())
     }
 }
