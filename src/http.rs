@@ -37,6 +37,13 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
             edit_display_set_value(display_id, TerrainOrCharacter::Terrain, terrain_str)
         }
 
+        (&Method::POST, ["displays", display_id, "edit", "unset", "character"]) => {
+            edit_display_unset_value(display_id, TerrainOrCharacter::Character)
+        }
+        (&Method::POST, ["displays", display_id, "edit", "unset", "terrain"]) => {
+            edit_display_unset_value(display_id, TerrainOrCharacter::Terrain)
+        }
+
         (&Method::POST, ["displays", display_id, "edit", "cursor", direction]) => {
             move_cursor(display_id, direction, true)
         }
@@ -151,6 +158,30 @@ fn edit_display_set_value(
         Ok(()) => (),
         Err(e) => {
             return internal_server_error(format!("could not update terrain or character: {:?}", e))
+        }
+    };
+
+    edit_display_response(display_id_str)
+}
+
+fn edit_display_unset_value(
+    display_id_str: &str,
+    value_type: TerrainOrCharacter,
+) -> Result<Response<Body>, hyper::Error> {
+    let db = db::DB::new();
+
+    let display_id = match display_id_str.parse::<u32>() {
+        Ok(v) => v,
+        Err(_e) => return bad_request_response("must supply map id as u32"),
+    };
+
+    match match value_type {
+        TerrainOrCharacter::Terrain => db.unset_display_terrain(display_id),
+        TerrainOrCharacter::Character => db.unset_display_character(display_id),
+    } {
+        Ok(()) => (),
+        Err(e) => {
+            return internal_server_error(format!("could not unset terrain or character: {:?}", e))
         }
     };
 

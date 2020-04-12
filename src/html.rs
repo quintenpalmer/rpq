@@ -277,6 +277,24 @@ fn build_terrain_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
                 }
                 .into_element()
             })
+            .chain(
+                vec![elements::Form {
+                    formmethod: attributes::Formmethod {
+                        inner: units::FormmethodValue::Post,
+                    },
+                    action: Some(attributes::Action {
+                        value: units::SourceValue::new(format!(
+                            "/displays/{}/edit/unset/terrain",
+                            display_id,
+                        )),
+                    }),
+                    inputs: Vec::new(),
+                    button: elements::Button::style_less(htmldsl::text("delete".into())),
+                    styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+                }
+                .into_element()]
+                .into_iter(),
+            )
             .collect(),
     )
 }
@@ -303,6 +321,24 @@ fn build_character_adding_buttons<'a>(display_id: u32) -> elements::Div<'a> {
                 }
                 .into_element()
             })
+            .chain(
+                vec![elements::Form {
+                    formmethod: attributes::Formmethod {
+                        inner: units::FormmethodValue::Post,
+                    },
+                    action: Some(attributes::Action {
+                        value: units::SourceValue::new(format!(
+                            "/displays/{}/edit/unset/character",
+                            display_id,
+                        )),
+                    }),
+                    inputs: Vec::new(),
+                    button: elements::Button::style_less(htmldsl::text("delete".into())),
+                    styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
+                }
+                .into_element()]
+                .into_iter(),
+            )
             .collect(),
     )
 }

@@ -340,6 +340,44 @@ impl DB {
 
         Ok(())
     }
+
+    pub fn unset_display_terrain(&self, display_id: u32) -> Result<(), String> {
+        let mut records = self.read_db_tile_lines()?;
+
+        let display = self.get_display(display_id)?;
+
+        records = records
+            .into_iter()
+            .filter(|record| {
+                !((record.map_id == display.map.id)
+                    && (record.x == display.current_selection.0)
+                    && (record.y == display.current_selection.1))
+            })
+            .collect();
+
+        self.write_replace_records(TILES_DB_FILE_NAME, records)?;
+
+        Ok(())
+    }
+
+    pub fn unset_display_character(&self, display_id: u32) -> Result<(), String> {
+        let mut records = self.read_db_characters()?;
+
+        let display = self.get_display(display_id)?;
+
+        records = records
+            .into_iter()
+            .filter(|record| {
+                !((record.map_id == display.map.id)
+                    && (record.x == display.current_selection.0)
+                    && (record.y == display.current_selection.1))
+            })
+            .collect();
+
+        self.write_replace_records(CHARACTER_DB_FILE_NAME, records)?;
+
+        Ok(())
+    }
 }
 
 fn display_model_from_db(
