@@ -133,8 +133,8 @@ impl DB {
         let new_record = DBMap {
             id: max_id + 1,
             default_terrain: models::Terrain::Grass,
-            hint_max_x: 25,
-            hint_max_y: 15,
+            hint_max_x: 15,
+            hint_max_y: 12,
         };
 
         records.push(new_record.clone());
