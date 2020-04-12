@@ -341,7 +341,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn unset_display_terrain(&self, game_id: u32) -> Result<(), String> {
+    pub fn unset_game_terrain(&self, game_id: u32) -> Result<(), String> {
         let mut records = self.read_db_tile_lines()?;
 
         let game = self.get_game(game_id)?;

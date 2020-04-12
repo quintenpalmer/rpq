@@ -176,7 +176,7 @@ fn edit_display_unset_value(
     };
 
     match match value_type {
-        TerrainOrCharacter::Terrain => db.unset_display_terrain(game_id),
+        TerrainOrCharacter::Terrain => db.unset_game_terrain(game_id),
         TerrainOrCharacter::Character => db.unset_display_character(game_id),
     } {
         Ok(()) => (),
