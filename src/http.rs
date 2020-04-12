@@ -99,13 +99,13 @@ fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let display = match db.get_display(game_id) {
+    let game = match db.get_display(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(html::display(
-        display,
+    Ok(Response::new(Body::from(html::render_page(html::game(
+        game,
     )))))
 }
 
@@ -117,13 +117,13 @@ fn edit_display_response(display_id_str: &str) -> Result<Response<Body>, hyper::
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let display = match db.get_display(game_id) {
+    let game = match db.get_display(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(
-        html::edit_display(display),
+        html::edit_display(game),
     ))))
 }
 
@@ -200,7 +200,7 @@ fn move_cursor(
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let mut display = match db.get_display(game_id) {
+    let mut game = match db.get_display(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
@@ -210,17 +210,17 @@ fn move_cursor(
         None => return bad_request_response("direction must be one of right, up, left, down"),
     };
 
-    display.move_cursor(direction);
+    game.move_cursor(direction);
 
-    match db.update_display_cursor(display.id, display.current_selection) {
+    match db.update_display_cursor(game.id, game.current_selection) {
         Ok(()) => (),
         Err(e) => return internal_server_error(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(if edit {
-        html::edit_display(display)
+        html::edit_display(game)
     } else {
-        html::display(display)
+        html::game(game)
     }))))
 }
 

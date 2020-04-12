@@ -361,12 +361,12 @@ pub fn displays<'a>(displays: Vec<models::Game>) -> elements::Body<'a> {
         elements::Div::style_less(
             displays
                 .into_iter()
-                .map(|display| {
+                .map(|game| {
                     elements::A::style_less(
                         attributes::Href {
-                            value: units::SourceValue::new(format!("/displays/{}", display.id)),
+                            value: units::SourceValue::new(format!("/displays/{}", game.id)),
                         },
-                        vec![htmldsl::text(format!("game: {}", display.id))],
+                        vec![htmldsl::text(format!("game: {}", game.id))],
                     )
                     .into_element()
                 })
@@ -379,9 +379,7 @@ pub fn displays<'a>(displays: Vec<models::Game>) -> elements::Body<'a> {
                             value: units::SourceValue::new("/displays".into()),
                         }),
                         inputs: Vec::new(),
-                        button: elements::Button::style_less(htmldsl::text(
-                            "add map display".into(),
-                        )),
+                        button: elements::Button::style_less(htmldsl::text("add map game".into())),
                         styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
                     }
                     .into_element()]
@@ -393,61 +391,61 @@ pub fn displays<'a>(displays: Vec<models::Game>) -> elements::Body<'a> {
     ])
 }
 
-pub fn display<'a>(display: models::Game) -> elements::Body<'a> {
+pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
         displays_link(),
         elements::H3::style_less(vec![
             elements::A::style_less(
                 attributes::Href {
-                    value: units::SourceValue::new(format!("/displays/{}", display.id)),
+                    value: units::SourceValue::new(format!("/displays/{}", game.id)),
                 },
                 vec![htmldsl::text("this map".into())],
             )
             .into_element(),
             elements::A::style_less(
                 attributes::Href {
-                    value: units::SourceValue::new(format!("/displays/{}/edit", display.id)),
+                    value: units::SourceValue::new(format!("/displays/{}/edit", game.id)),
                 },
                 vec![htmldsl::text("edit".into())],
             )
             .into_element(),
         ])
         .into_element(),
-        display.into_html(false),
-        cursor_form_button(display.id, models::Direction::Left, false),
-        cursor_form_button(display.id, models::Direction::Up, false),
-        cursor_form_button(display.id, models::Direction::Down, false),
-        cursor_form_button(display.id, models::Direction::Right, false),
+        game.into_html(false),
+        cursor_form_button(game.id, models::Direction::Left, false),
+        cursor_form_button(game.id, models::Direction::Up, false),
+        cursor_form_button(game.id, models::Direction::Down, false),
+        cursor_form_button(game.id, models::Direction::Right, false),
     ])
 }
 
-pub fn edit_display<'a>(display: models::Game) -> elements::Body<'a> {
+pub fn edit_display<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
         displays_link(),
         elements::H3::style_less(vec![
             elements::A::style_less(
                 attributes::Href {
-                    value: units::SourceValue::new(format!("/displays/{}", display.id)),
+                    value: units::SourceValue::new(format!("/displays/{}", game.id)),
                 },
                 vec![htmldsl::text("view map".into())],
             )
             .into_element(),
             elements::A::style_less(
                 attributes::Href {
-                    value: units::SourceValue::new(format!("/displays/{}/edit", display.id)),
+                    value: units::SourceValue::new(format!("/displays/{}/edit", game.id)),
                 },
                 vec![htmldsl::text("editing".into())],
             )
             .into_element(),
         ])
         .into_element(),
-        display.into_html(true),
-        cursor_form_button(display.id, models::Direction::Left, true),
-        cursor_form_button(display.id, models::Direction::Up, true),
-        cursor_form_button(display.id, models::Direction::Down, true),
-        cursor_form_button(display.id, models::Direction::Right, true),
+        game.into_html(true),
+        cursor_form_button(game.id, models::Direction::Left, true),
+        cursor_form_button(game.id, models::Direction::Up, true),
+        cursor_form_button(game.id, models::Direction::Down, true),
+        cursor_form_button(game.id, models::Direction::Right, true),
     ])
 }
 
