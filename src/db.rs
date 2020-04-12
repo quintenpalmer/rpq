@@ -17,6 +17,14 @@ const ALL_DB_FILE_NAMES: &'static [&'static str] = &[
     CHARACTER_DB_FILE_NAME,
 ];
 
+#[derive(Debug)]
+pub enum DBError {
+    FindingTable(String),
+    ParsingRecord(String),
+    FindingRecord(String),
+    Internal(std::io::Error),
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 struct DBGame {
     id: u32,
@@ -69,7 +77,7 @@ impl DB {
         DB { _nothing: () }
     }
 
-    pub fn get_games(&self) -> Result<Vec<models::Game>, String> {
+    pub fn get_games(&self) -> Result<Vec<models::Game>, DBError> {
         Ok(self
             .read_db_games()?
             .into_iter()
@@ -79,34 +87,36 @@ impl DB {
                 let characters = self.read_db_characters_for_game_id(x.id)?;
                 Ok(game_model_from_db(x, map, tiles, characters))
             })
-            .collect::<Result<Vec<models::Game>, String>>()?)
+            .collect::<Result<Vec<models::Game>, DBError>>()?)
     }
 
-    pub fn get_game(&self, game_id: u32) -> Result<models::Game, String> {
+    pub fn get_game(&self, game_id: u32) -> Result<models::Game, DBError> {
         for game in self.get_games()?.into_iter() {
             if game.id == game_id {
                 return Ok(game);
             }
         }
-        return Err("could not find game with supplied id".into());
+        return Err(DBError::FindingRecord("games".into()));
     }
 
-    fn read_db_games(&self) -> Result<Vec<DBGame>, String> {
-        let mut rdr = csv::Reader::from_reader(
-            File::open(GAME_DB_FILE_NAME)
-                .map_err(|e| format!("could not read from file: {:?}", e))?,
-        );
+    fn read_db_games(&self) -> Result<Vec<DBGame>, DBError> {
+        let mut rdr =
+            csv::Reader::from_reader(File::open(GAME_DB_FILE_NAME).map_err(|e| {
+                DBError::FindingTable(format!("could not read from file: {:?}", e))
+            })?);
         let records = rdr
             .deserialize()
             .into_iter()
-            .map(|result| -> Result<DBGame, String> {
-                result.map_err(|e| format!("could not read row for game: {:?}", e))
+            .map(|result| -> Result<DBGame, DBError> {
+                result.map_err(|e| {
+                    DBError::ParsingRecord(format!("could not read row for game: {:?}", e))
+                })
             })
-            .collect::<Result<Vec<DBGame>, String>>()?;
+            .collect::<Result<Vec<DBGame>, DBError>>()?;
         Ok(records)
     }
 
-    pub fn get_maps(&self) -> Result<Vec<models::Map>, String> {
+    pub fn get_maps(&self) -> Result<Vec<models::Map>, DBError> {
         Ok(self
             .read_db_maps()?
             .into_iter()
@@ -114,19 +124,19 @@ impl DB {
                 let tiles = self.read_db_tile_lines_for_map_id(map.id)?;
                 Ok(map_model_from_db(map, tiles))
             })
-            .collect::<Result<Vec<models::Map>, String>>()?)
+            .collect::<Result<Vec<models::Map>, DBError>>()?)
     }
 
-    pub fn get_map(&self, map_id: u32) -> Result<models::Map, String> {
+    pub fn get_map(&self, map_id: u32) -> Result<models::Map, DBError> {
         for map in self.get_maps()?.into_iter() {
             if map.id == map_id {
                 return Ok(map);
             }
         }
-        return Err("could not find map with supplied id".into());
+        return Err(DBError::FindingRecord("map".into()));
     }
 
-    pub fn add_game(&self) -> Result<(), String> {
+    pub fn add_game(&self) -> Result<(), DBError> {
         let map = self.add_db_map()?;
 
         let mut records = self.read_db_games()?;
@@ -144,7 +154,7 @@ impl DB {
         self.write_replace_records(GAME_DB_FILE_NAME, records)
     }
 
-    fn add_db_map(&self) -> Result<DBMap, String> {
+    fn add_db_map(&self) -> Result<DBMap, DBError> {
         let mut records = self.read_db_maps()?;
         let max_id = records
             .iter()
@@ -164,27 +174,29 @@ impl DB {
         Ok(new_record)
     }
 
-    fn get_db_map(&self, map_id: u32) -> Result<DBMap, String> {
+    fn get_db_map(&self, map_id: u32) -> Result<DBMap, DBError> {
         for record in self.read_db_maps()?.into_iter() {
             if record.id == map_id {
                 return Ok(record);
             }
         }
-        return Err("could not find record with supplied id".into());
+        return Err(DBError::FindingRecord("maps".into()));
     }
 
-    fn read_db_maps(&self) -> Result<Vec<DBMap>, String> {
-        let mut rdr = csv::Reader::from_reader(
-            File::open(MAP_DB_FILE_NAME)
-                .map_err(|e| format!("could not read from file: {:?}", e))?,
-        );
+    fn read_db_maps(&self) -> Result<Vec<DBMap>, DBError> {
+        let mut rdr =
+            csv::Reader::from_reader(File::open(MAP_DB_FILE_NAME).map_err(|e| {
+                DBError::FindingTable(format!("could not read from file: {:?}", e))
+            })?);
         let records = rdr
             .deserialize()
             .into_iter()
-            .map(|result| -> Result<DBMap, String> {
-                result.map_err(|e| format!("could not read row for game: {:?}", e))
+            .map(|result| -> Result<DBMap, DBError> {
+                result.map_err(|e| {
+                    DBError::ParsingRecord(format!("could not read row for game: {:?}", e))
+                })
             })
-            .collect::<Result<Vec<DBMap>, String>>()?;
+            .collect::<Result<Vec<DBMap>, DBError>>()?;
         Ok(records)
     }
 
@@ -192,7 +204,7 @@ impl DB {
         &self,
         db_file_name: &'static str,
         records: Vec<S>,
-    ) -> Result<(), String> {
+    ) -> Result<(), DBError> {
         let mut writer = csv::Writer::from_path(db_file_name).unwrap();
 
         for record in records.into_iter() {
@@ -200,13 +212,13 @@ impl DB {
         }
         match writer.flush() {
             Ok(()) => (),
-            Err(e) => return Err(format!("error flushing: {:?}", e)),
+            Err(e) => return Err(DBError::Internal(e)),
         };
 
         Ok(())
     }
 
-    pub fn update_game_cursor(&self, id: u32, cursor: (u32, u32)) -> Result<(), String> {
+    pub fn update_game_cursor(&self, id: u32, cursor: (u32, u32)) -> Result<(), DBError> {
         let records = self
             .read_db_games()?
             .into_iter()
@@ -223,7 +235,7 @@ impl DB {
         self.write_replace_records(GAME_DB_FILE_NAME, records)
     }
 
-    fn read_db_tile_lines_for_map_id(&self, map_id: u32) -> Result<Vec<DBTileLine>, String> {
+    fn read_db_tile_lines_for_map_id(&self, map_id: u32) -> Result<Vec<DBTileLine>, DBError> {
         Ok(self
             .read_db_tile_lines()?
             .into_iter()
@@ -231,22 +243,24 @@ impl DB {
             .collect())
     }
 
-    fn read_db_tile_lines(&self) -> Result<Vec<DBTileLine>, String> {
-        let mut rdr = csv::Reader::from_reader(
-            File::open(TILES_DB_FILE_NAME)
-                .map_err(|e| format!("could not read from file: {:?}", e))?,
-        );
+    fn read_db_tile_lines(&self) -> Result<Vec<DBTileLine>, DBError> {
+        let mut rdr =
+            csv::Reader::from_reader(File::open(TILES_DB_FILE_NAME).map_err(|e| {
+                DBError::FindingTable(format!("could not read from file: {:?}", e))
+            })?);
         let records = rdr
             .deserialize()
             .into_iter()
-            .map(|result| -> Result<DBTileLine, String> {
-                result.map_err(|e| format!("could not read row for record: {:?}", e))
+            .map(|result| -> Result<DBTileLine, DBError> {
+                result.map_err(|e| {
+                    DBError::ParsingRecord(format!("could not read row for record: {:?}", e))
+                })
             })
-            .collect::<Result<Vec<DBTileLine>, String>>()?;
+            .collect::<Result<Vec<DBTileLine>, DBError>>()?;
         Ok(records)
     }
 
-    fn read_db_characters_for_game_id(&self, game_id: u32) -> Result<Vec<DBCharacter>, String> {
+    fn read_db_characters_for_game_id(&self, game_id: u32) -> Result<Vec<DBCharacter>, DBError> {
         Ok(self
             .read_db_characters()?
             .into_iter()
@@ -254,18 +268,20 @@ impl DB {
             .collect())
     }
 
-    fn read_db_characters(&self) -> Result<Vec<DBCharacter>, String> {
-        let mut rdr = csv::Reader::from_reader(
-            File::open(CHARACTER_DB_FILE_NAME)
-                .map_err(|e| format!("could not read from file: {:?}", e))?,
-        );
+    fn read_db_characters(&self) -> Result<Vec<DBCharacter>, DBError> {
+        let mut rdr =
+            csv::Reader::from_reader(File::open(CHARACTER_DB_FILE_NAME).map_err(|e| {
+                DBError::FindingTable(format!("could not read from file: {:?}", e))
+            })?);
         let records = rdr
             .deserialize()
             .into_iter()
-            .map(|result| -> Result<DBCharacter, String> {
-                result.map_err(|e| format!("could not read row for record: {:?}", e))
+            .map(|result| -> Result<DBCharacter, DBError> {
+                result.map_err(|e| {
+                    DBError::ParsingRecord(format!("could not read row for record: {:?}", e))
+                })
             })
-            .collect::<Result<Vec<DBCharacter>, String>>()?;
+            .collect::<Result<Vec<DBCharacter>, DBError>>()?;
         Ok(records)
     }
 
@@ -273,7 +289,7 @@ impl DB {
         &self,
         game_id: u32,
         terrain: models::Terrain,
-    ) -> Result<(), String> {
+    ) -> Result<(), DBError> {
         let mut records = self.read_db_tile_lines()?;
         let max_id = records
             .iter()
@@ -319,7 +335,7 @@ impl DB {
         &self,
         game_id: u32,
         character: models::Character,
-    ) -> Result<(), String> {
+    ) -> Result<(), DBError> {
         let mut records = self.read_db_characters()?;
         let max_id = records
             .iter()
@@ -361,7 +377,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn unset_game_terrain(&self, game_id: u32) -> Result<(), String> {
+    pub fn unset_game_terrain(&self, game_id: u32) -> Result<(), DBError> {
         let mut records = self.read_db_tile_lines()?;
 
         let game = self.get_game(game_id)?;
@@ -380,7 +396,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn unset_game_character(&self, game_id: u32) -> Result<(), String> {
+    pub fn unset_game_character(&self, game_id: u32) -> Result<(), DBError> {
         let mut records = self.read_db_characters()?;
 
         let game = self.get_game(game_id)?;
