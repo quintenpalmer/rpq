@@ -360,7 +360,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn unset_display_character(&self, game_id: u32) -> Result<(), String> {
+    pub fn unset_game_character(&self, game_id: u32) -> Result<(), String> {
         let mut records = self.read_db_characters()?;
 
         let game = self.get_game(game_id)?;
