@@ -362,7 +362,7 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
 }
 
 pub fn index<'a>() -> elements::Body<'a> {
-    elements::Body::style_less(vec![index_link(), games_link()])
+    elements::Body::style_less(vec![index_link(), games_link(), maps_link()])
 }
 
 pub fn games<'a>(games: Vec<models::Game>) -> elements::Body<'a> {
@@ -405,7 +405,7 @@ pub fn games<'a>(games: Vec<models::Game>) -> elements::Body<'a> {
 pub fn maps<'a>(maps: Vec<models::Map>) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),
-        games_link(),
+        maps_link(),
         elements::Div::style_less(
             maps.into_iter()
                 .map(|map| {
@@ -522,6 +522,17 @@ fn index_link() -> htmldsl::Element {
             value: units::SourceValue::new("/".into()),
         },
         vec![htmldsl::text("home".into())],
+    )
+    .into_element()])
+    .into_element()
+}
+
+fn maps_link() -> htmldsl::Element {
+    elements::H2::style_less(vec![elements::A::style_less(
+        attributes::Href {
+            value: units::SourceValue::new("/maps".into()),
+        },
+        vec![htmldsl::text("maps".into())],
     )
     .into_element()])
     .into_element()
