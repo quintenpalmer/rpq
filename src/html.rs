@@ -1,3 +1,5 @@
+use std::iter::Iterator;
+
 use htmldsl::attributes;
 use htmldsl::elements;
 use htmldsl::style_sheet;
@@ -115,23 +117,28 @@ impl models::Character {
 }
 
 impl models::Map {
-    fn into_html(&self, current_selection: Option<(u32, u32)>) -> htmldsl::Element {
+    fn into_html<'a, T: Iterator<Item = (&'a (u32, u32), elements::Img<'static>)>>(
+        &self,
+        overlay_elements: T,
+        current_selection: Option<(u32, u32)>,
+    ) -> htmldsl::Element {
         let (max_x, max_y) = self.maxes();
-        let mut empty_rendered_map: Vec<Vec<(models::Terrain, Option<models::Character>, bool)>> =
-            (0..max_y)
-                .into_iter()
-                .map(|_| {
-                    (0..max_x)
-                        .into_iter()
-                        .map(|_| (self.default_terrain.clone(), None, false))
-                        .collect()
-                })
-                .collect();
+        let mut empty_rendered_map: Vec<
+            Vec<(models::Terrain, Option<elements::Img<'static>>, bool)>,
+        > = (0..max_y)
+            .into_iter()
+            .map(|_| {
+                (0..max_x)
+                    .into_iter()
+                    .map(|_| (self.default_terrain.clone(), None, false))
+                    .collect()
+            })
+            .collect();
         for ((x, y), terrain) in self.specified_terrain.iter() {
             empty_rendered_map[(max_y - *y - 1) as usize][*x as usize].0 = terrain.clone();
         }
-        for ((x, y), character) in self.characters.iter() {
-            empty_rendered_map[(max_y - *y - 1) as usize][*x as usize].1 = Some(character.clone());
+        for (&(x, y), overlay_img) in overlay_elements.into_iter() {
+            empty_rendered_map[(max_y - y - 1) as usize][x as usize].1 = Some(overlay_img);
         }
         match current_selection {
             Some((x, y)) => empty_rendered_map[(max_y - y - 1) as usize][x as usize].2 = true,
@@ -155,9 +162,7 @@ impl models::Map {
                                                     .into_html()
                                                     .add_style(vec![&styles::Display::Block])
                                                     .into_element()],
-                                                data.1.map(|x| {
-                                                    absolute_hover(x.into_html()).into_element()
-                                                }),
+                                                data.1.map(|x| absolute_hover(x).into_element()),
                                             ),
                                             if data.2 {
                                                 Some(
@@ -184,7 +189,8 @@ impl models::Map {
 
 impl models::Game {
     fn into_html(&self, edit: bool) -> htmldsl::Element {
-        let (terrain, o_character) = self.map.at(&self.current_selection);
+        let terrain = self.map.at(&self.current_selection);
+        let o_character = self.character_at(&self.current_selection);
 
         let hover_info = elements::Div::style_less(vec![
             elements::P::style_less(maybe_append(
@@ -244,7 +250,12 @@ impl models::Game {
         elements::Table::style_less(
             None,
             elements::Tbody::style_less(vec![elements::Tr::style_less(vec![
-                elements::Td::style_less(vec![self.map.into_html(Some(self.current_selection))]),
+                elements::Td::style_less(vec![self.map.into_html(
+                    self.characters
+                        .iter()
+                        .map(|(k, v)| (k, v.clone().into_html())),
+                    Some(self.current_selection),
+                )]),
                 elements::Td::style_less(vec![hover_info]),
             ])]),
         )

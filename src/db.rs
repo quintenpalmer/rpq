@@ -395,13 +395,13 @@ fn game_model_from_db(
                 .into_iter()
                 .map(|tile| ((tile.x, tile.y), tile.terrain))
                 .collect::<BTreeMap<_, _>>(),
-            characters: characters
-                .into_iter()
-                .map(|character| ((character.x, character.y), character.character))
-                .collect::<BTreeMap<_, _>>(),
             hint_max_x: m.hint_max_x,
             hint_max_y: m.hint_max_y,
         },
+        characters: characters
+            .into_iter()
+            .map(|character| ((character.x, character.y), character.character))
+            .collect::<BTreeMap<_, _>>(),
         current_selection: (g.cursor_x, g.cursor_y),
     }
 }

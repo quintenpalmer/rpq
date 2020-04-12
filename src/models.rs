@@ -115,40 +115,38 @@ pub struct Map {
     pub id: u32,
     pub default_terrain: Terrain,
     pub specified_terrain: BTreeMap<(u32, u32), Terrain>,
-    pub characters: BTreeMap<(u32, u32), Character>,
     pub hint_max_x: u32,
     pub hint_max_y: u32,
 }
 
 impl Map {
     pub fn maxes(&self) -> (u32, u32) {
-        self.characters.keys().fold(
-            self.specified_terrain.keys().fold(
-                (self.hint_max_x, self.hint_max_y),
-                |(acc_x, acc_y), (x, y)| (std::cmp::max(acc_x, *x), std::cmp::max(acc_y, *y)),
-            ),
+        self.specified_terrain.keys().fold(
+            (self.hint_max_x, self.hint_max_y),
             |(acc_x, acc_y), (x, y)| (std::cmp::max(acc_x, *x), std::cmp::max(acc_y, *y)),
         )
     }
 
-    pub fn at(&self, cursor: &(u32, u32)) -> (Terrain, Option<Character>) {
-        (
-            self.specified_terrain
-                .get(cursor)
-                .map(|x| x.clone())
-                .unwrap_or(self.default_terrain.clone()),
-            self.characters.get(cursor).map(|x| x.clone()),
-        )
+    pub fn at(&self, cursor: &(u32, u32)) -> Terrain {
+        self.specified_terrain
+            .get(cursor)
+            .map(|x| x.clone())
+            .unwrap_or(self.default_terrain.clone())
     }
 }
 
 pub struct Game {
     pub id: u32,
     pub map: Map,
+    pub characters: BTreeMap<(u32, u32), Character>,
     pub current_selection: (u32, u32),
 }
 
 impl Game {
+    pub fn character_at(&self, cursor: &(u32, u32)) -> Option<Character> {
+        self.characters.get(cursor).map(|v| v.clone())
+    }
+
     pub fn move_cursor(&mut self, direction: Direction) {
         let (max_x, max_y) = self.map.maxes();
         match direction {
