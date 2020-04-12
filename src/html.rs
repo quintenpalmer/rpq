@@ -438,6 +438,22 @@ pub fn maps<'a>(maps: Vec<models::Map>) -> elements::Body<'a> {
     ])
 }
 
+pub fn map<'a>(map: models::Map) -> elements::Body<'a> {
+    elements::Body::style_less(vec![
+        index_link(),
+        maps_link(),
+        elements::H3::style_less(vec![elements::A::style_less(
+            attributes::Href {
+                value: units::SourceValue::new(format!("/maps/{}", map.id)),
+            },
+            vec![htmldsl::text("this map".into())],
+        )
+        .into_element()])
+        .into_element(),
+        map.into_html(Vec::new().into_iter(), None),
+    ])
+}
+
 pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         index_link(),

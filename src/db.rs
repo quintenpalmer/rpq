@@ -117,6 +117,15 @@ impl DB {
             .collect::<Result<Vec<models::Map>, String>>()?)
     }
 
+    pub fn get_map(&self, map_id: u32) -> Result<models::Map, String> {
+        for map in self.get_maps()?.into_iter() {
+            if map.id == map_id {
+                return Ok(map);
+            }
+        }
+        return Err("could not find map with supplied id".into());
+    }
+
     pub fn add_game(&self) -> Result<(), String> {
         let map = self.add_db_map()?;
 
