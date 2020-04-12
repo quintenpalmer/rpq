@@ -463,7 +463,7 @@ pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
                 attributes::Href {
                     value: units::SourceValue::new(format!("/games/{}", game.id)),
                 },
-                vec![htmldsl::text("this map".into())],
+                vec![htmldsl::text("this game".into())],
             )
             .into_element(),
             elements::A::style_less(
