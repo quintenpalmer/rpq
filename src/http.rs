@@ -99,7 +99,7 @@ fn display_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let game = match db.get_display(game_id) {
+    let game = match db.get_game(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
@@ -117,7 +117,7 @@ fn edit_display_response(game_id_str: &str) -> Result<Response<Body>, hyper::Err
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let game = match db.get_display(game_id) {
+    let game = match db.get_game(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };
@@ -200,7 +200,7 @@ fn move_cursor(
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
 
-    let mut game = match db.get_display(game_id) {
+    let mut game = match db.get_game(game_id) {
         Ok(d) => d,
         Err(e) => return internal_server_error(e),
     };

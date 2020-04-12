@@ -82,7 +82,7 @@ impl DB {
             .collect::<Result<Vec<models::Game>, String>>()?)
     }
 
-    pub fn get_display(&self, game_id: u32) -> Result<models::Game, String> {
+    pub fn get_game(&self, game_id: u32) -> Result<models::Game, String> {
         for display in self.get_games()?.into_iter() {
             if display.id == game_id {
                 return Ok(display);
@@ -259,7 +259,7 @@ impl DB {
             .iter()
             .fold(0, |acc, record| std::cmp::max(acc, record.id));
 
-        let display = self.get_display(game_id)?;
+        let display = self.get_game(game_id)?;
 
         let new_record = DBTileLine {
             id: max_id + 1,
@@ -305,7 +305,7 @@ impl DB {
             .iter()
             .fold(0, |acc, record| std::cmp::max(acc, record.id));
 
-        let display = self.get_display(game_id)?;
+        let display = self.get_game(game_id)?;
 
         let new_record = DBCharacter {
             id: max_id + 1,
@@ -344,7 +344,7 @@ impl DB {
     pub fn unset_display_terrain(&self, game_id: u32) -> Result<(), String> {
         let mut records = self.read_db_tile_lines()?;
 
-        let display = self.get_display(game_id)?;
+        let display = self.get_game(game_id)?;
 
         records = records
             .into_iter()
@@ -363,7 +363,7 @@ impl DB {
     pub fn unset_display_character(&self, game_id: u32) -> Result<(), String> {
         let mut records = self.read_db_characters()?;
 
-        let display = self.get_display(game_id)?;
+        let display = self.get_game(game_id)?;
 
         records = records
             .into_iter()
