@@ -26,6 +26,8 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Serve some instructions at /
         (&Method::GET, []) => index_response(),
 
+        (&Method::GET, ["maps"]) => maps_response(),
+
         (&Method::GET, ["games"]) => games_response(),
         (&Method::POST, ["games"]) => games_create_response(),
         (&Method::GET, ["games", game_id]) => game_response(game_id),
@@ -67,6 +69,18 @@ enum TerrainOrCharacter {
 
 fn index_response() -> Result<Response<Body>, hyper::Error> {
     Ok(Response::new(Body::from(html::render_page(html::index()))))
+}
+
+fn maps_response() -> Result<Response<Body>, hyper::Error> {
+    let db = db::DB::new();
+    let games = match db.get_maps() {
+        Ok(d) => d,
+        Err(e) => return internal_server_error(e),
+    };
+
+    Ok(Response::new(Body::from(html::render_page(html::maps(
+        games,
+    )))))
 }
 
 fn games_response() -> Result<Response<Body>, hyper::Error> {

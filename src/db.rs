@@ -106,6 +106,17 @@ impl DB {
         Ok(records)
     }
 
+    pub fn get_maps(&self) -> Result<Vec<models::Map>, String> {
+        Ok(self
+            .read_db_maps()?
+            .into_iter()
+            .map(|map| {
+                let tiles = self.read_db_tile_lines_for_map_id(map.id)?;
+                Ok(map_model_from_db(map, tiles))
+            })
+            .collect::<Result<Vec<models::Map>, String>>()?)
+    }
+
     pub fn add_game(&self) -> Result<(), String> {
         let map = self.add_db_map()?;
 
