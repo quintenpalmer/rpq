@@ -186,9 +186,11 @@ fn move_cursor(
         Err(e) => return internal_server_error(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(html::display(
-        display,
-    )))))
+    Ok(Response::new(Body::from(html::render_page(if edit {
+        html::edit_display(display)
+    } else {
+        html::display(display)
+    }))))
 }
 
 fn not_found_response() -> Result<Response<Body>, hyper::Error> {
