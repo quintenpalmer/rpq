@@ -254,6 +254,25 @@ impl DB {
         display_id: u32,
         terrain: models::Terrain,
     ) -> Result<(), String> {
+        let mut records = self.read_db_tile_lines()?;
+        let max_id = records
+            .iter()
+            .fold(0, |acc, record| std::cmp::max(acc, record.id));
+
+        let display = self.get_display(display_id)?;
+
+        let new_record = DBTileLine {
+            id: max_id + 1,
+            map_id: display.map.id,
+            terrain: terrain,
+            x: display.current_selection.0,
+            y: display.current_selection.1,
+        };
+
+        records.push(new_record.clone());
+
+        self.write_replace_records(TILES_DB_FILE_NAME, records)?;
+
         Ok(())
     }
 
