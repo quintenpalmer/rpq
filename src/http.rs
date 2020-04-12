@@ -91,10 +91,10 @@ fn games_create_response() -> Result<Response<Body>, hyper::Error> {
     games_response()
 }
 
-fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error> {
+fn display_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let game_id = match display_id_str.parse::<u32>() {
+    let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
@@ -109,10 +109,10 @@ fn display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error
     )))))
 }
 
-fn edit_display_response(display_id_str: &str) -> Result<Response<Body>, hyper::Error> {
+fn edit_display_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let game_id = match display_id_str.parse::<u32>() {
+    let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
@@ -128,13 +128,13 @@ fn edit_display_response(display_id_str: &str) -> Result<Response<Body>, hyper::
 }
 
 fn edit_display_set_value(
-    display_id_str: &str,
+    game_id_str: &str,
     value_type: TerrainOrCharacter,
     value_value: &str,
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let game_id = match display_id_str.parse::<u32>() {
+    let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
@@ -161,16 +161,16 @@ fn edit_display_set_value(
         }
     };
 
-    edit_display_response(display_id_str)
+    edit_display_response(game_id_str)
 }
 
 fn edit_display_unset_value(
-    display_id_str: &str,
+    game_id_str: &str,
     value_type: TerrainOrCharacter,
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let game_id = match display_id_str.parse::<u32>() {
+    let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
@@ -185,17 +185,17 @@ fn edit_display_unset_value(
         }
     };
 
-    edit_display_response(display_id_str)
+    edit_display_response(game_id_str)
 }
 
 fn move_cursor(
-    display_id_str: &str,
+    game_id_str: &str,
     direction_str: &str,
     edit: bool,
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
-    let game_id = match display_id_str.parse::<u32>() {
+    let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
         Err(_e) => return bad_request_response("must supply map id as u32"),
     };
