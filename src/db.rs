@@ -45,7 +45,7 @@ struct DBTileLine {
 #[derive(Serialize, Deserialize, Clone)]
 struct DBCharacter {
     id: u32,
-    map_id: u32,
+    game_id: u32,
     character: models::Character,
     x: u32,
     y: u32,
@@ -76,7 +76,7 @@ impl DB {
             .map(|x| {
                 let map = self.get_db_map(x.map_id)?;
                 let tiles = self.read_db_tile_lines_for_map_id(map.id)?;
-                let characters = self.read_db_characters_for_map_id(map.id)?;
+                let characters = self.read_db_characters_for_game_id(x.id)?;
                 Ok(game_model_from_db(x, map, tiles, characters))
             })
             .collect::<Result<Vec<models::Game>, String>>()?)
@@ -226,11 +226,11 @@ impl DB {
         Ok(records)
     }
 
-    fn read_db_characters_for_map_id(&self, map_id: u32) -> Result<Vec<DBCharacter>, String> {
+    fn read_db_characters_for_game_id(&self, game_id: u32) -> Result<Vec<DBCharacter>, String> {
         Ok(self
             .read_db_characters()?
             .into_iter()
-            .filter(|record| record.map_id == map_id)
+            .filter(|record| record.game_id == game_id)
             .collect())
     }
 
@@ -309,7 +309,7 @@ impl DB {
 
         let new_record = DBCharacter {
             id: max_id + 1,
-            map_id: game.map.id,
+            game_id: game.map.id,
             character: character,
             x: game.current_selection.0,
             y: game.current_selection.1,
@@ -321,7 +321,7 @@ impl DB {
             .into_iter()
             .map(|record| {
                 (
-                    (record.map_id, record.x, record.y),
+                    (record.game_id, record.x, record.y),
                     (record.id, record.character),
                 )
             })
@@ -329,7 +329,7 @@ impl DB {
             .into_iter()
             .map(|(key, value)| DBCharacter {
                 id: value.0,
-                map_id: key.0,
+                game_id: key.0,
                 character: value.1,
                 x: key.1,
                 y: key.2,
@@ -368,7 +368,7 @@ impl DB {
         records = records
             .into_iter()
             .filter(|record| {
-                !((record.map_id == game.map.id)
+                !((record.game_id == game.id)
                     && (record.x == game.current_selection.0)
                     && (record.y == game.current_selection.1))
             })
