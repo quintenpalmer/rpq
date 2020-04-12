@@ -83,7 +83,7 @@ fn games_response() -> Result<Response<Body>, hyper::Error> {
 
 fn games_create_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
-    match db.add_display() {
+    match db.add_game() {
         Ok(()) => (),
         Err(e) => return internal_server_error(e),
     };

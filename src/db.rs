@@ -106,7 +106,7 @@ impl DB {
         Ok(records)
     }
 
-    pub fn add_display(&self) -> Result<(), String> {
+    pub fn add_game(&self) -> Result<(), String> {
         let map = self.add_db_map()?;
 
         let mut records = self.read_db_games()?;
