@@ -77,7 +77,7 @@ impl DB {
                 let map = self.get_db_map(x.map_id)?;
                 let tiles = self.read_db_tile_lines_for_map_id(map.id)?;
                 let characters = self.read_db_characters_for_map_id(map.id)?;
-                Ok(display_model_from_db(x, map, tiles, characters))
+                Ok(game_model_from_db(x, map, tiles, characters))
             })
             .collect::<Result<Vec<models::Game>, String>>()?)
     }
@@ -380,7 +380,7 @@ impl DB {
     }
 }
 
-fn display_model_from_db(
+fn game_model_from_db(
     d: DBDisplay,
     m: DBMap,
     tiles: Vec<DBTileLine>,
