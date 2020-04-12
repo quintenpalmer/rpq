@@ -273,6 +273,7 @@ fn display_model_from_db(
     models::Display {
         id: d.id,
         map: models::Map {
+            id: m.id,
             default_terrain: m.default_terrain,
             specified_terrain: tiles
                 .into_iter()

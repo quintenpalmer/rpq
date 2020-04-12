@@ -112,6 +112,7 @@ impl Character {
 }
 
 pub struct Map {
+    pub id: u32,
     pub default_terrain: Terrain,
     pub specified_terrain: BTreeMap<(u32, u32), Terrain>,
     pub characters: BTreeMap<(u32, u32), Character>,
