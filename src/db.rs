@@ -381,13 +381,13 @@ impl DB {
 }
 
 fn game_model_from_db(
-    d: DBGame,
+    g: DBGame,
     m: DBMap,
     tiles: Vec<DBTileLine>,
     characters: Vec<DBCharacter>,
 ) -> models::Game {
     models::Game {
-        id: d.id,
+        id: g.id,
         map: models::Map {
             id: m.id,
             default_terrain: m.default_terrain,
@@ -402,6 +402,6 @@ fn game_model_from_db(
             hint_max_x: m.hint_max_x,
             hint_max_y: m.hint_max_y,
         },
-        current_selection: (d.cursor_x, d.cursor_y),
+        current_selection: (g.cursor_x, g.cursor_y),
     }
 }
