@@ -9,6 +9,7 @@ use htmldsl::{TagRenderableIntoElement, TagRenderableStyleSetter};
 use super::models;
 
 pub mod common;
+pub mod index;
 mod shared;
 mod util;
 
@@ -304,14 +305,6 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
         }
         None => vec,
     }
-}
-
-pub fn index<'a>() -> elements::Body<'a> {
-    elements::Body::style_less(vec![
-        shared::index_link(),
-        shared::games_link(),
-        shared::maps_link(),
-    ])
 }
 
 pub fn games<'a>(games: Vec<models::Game>) -> elements::Body<'a> {
