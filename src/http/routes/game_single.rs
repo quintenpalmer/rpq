@@ -3,7 +3,7 @@ use hyper::{Body, Response};
 use crate::db;
 use crate::html;
 
-use super::util;
+use crate::http::util;
 
 pub fn handle_get(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();

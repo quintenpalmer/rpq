@@ -4,7 +4,7 @@ use crate::db;
 use crate::html;
 use crate::models;
 
-use super::util;
+use crate::http::util;
 
 pub fn handle_post(
     game_id_str: &str,

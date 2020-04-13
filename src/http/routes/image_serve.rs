@@ -2,7 +2,7 @@ use hyper::{Body, Response};
 use std::fs::File;
 use std::io::{ErrorKind, Read};
 
-use super::util;
+use crate::http::util;
 
 pub fn handle_get(file_name: &str) -> Result<Response<Body>, hyper::Error> {
     let (name, suffix) = match file_name.split('.').collect::<Vec<&str>>().as_slice() {
