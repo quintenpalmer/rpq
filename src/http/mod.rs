@@ -1,5 +1,6 @@
 mod game_list;
 mod game_single;
+mod image_serve;
 mod index;
 mod map_list;
 mod map_single;
