@@ -7,6 +7,7 @@ use crate::html;
 use crate::models;
 
 use super::index;
+use super::util;
 
 /// This is our service handler. It receives a Request, routes on its
 /// path, and returns a Future of a Response.
@@ -61,7 +62,7 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         (&Method::GET, ["images", name]) => serve_image(name),
 
         // Return the 404 Not Found for other routes.
-        _ => not_found_response(),
+        _ => util::not_found_response(),
     }
 }
 
@@ -74,7 +75,7 @@ fn maps_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
     let games = match db.get_maps() {
         Ok(d) => d,
-        Err(e) => return db_error_page(e),
+        Err(e) => return util::db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::maps(
@@ -92,7 +93,7 @@ fn map_response(map_id_str: &str) -> Result<Response<Body>, hyper::Error> {
 
     let map = match db.get_map(map_id) {
         Ok(d) => d,
-        Err(e) => return db_error_page(e),
+        Err(e) => return util::db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::map(map)))))
@@ -102,7 +103,7 @@ fn games_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
     let games = match db.get_games() {
         Ok(d) => d,
-        Err(e) => return db_error_page(e),
+        Err(e) => return util::db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::games(
@@ -114,7 +115,7 @@ fn games_create_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
     match db.add_game() {
         Ok(()) => (),
-        Err(e) => return db_error_page(e),
+        Err(e) => return util::db_error_page(e),
     };
 
     games_response()
@@ -130,7 +131,7 @@ fn game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
 
     let game = match db.get_game(game_id) {
         Ok(d) => d,
-        Err(e) => return db_error_page(e),
+        Err(e) => return util::db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::game(
@@ -148,7 +149,7 @@ fn edit_game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error>
 
     let game = match db.get_game(game_id) {
         Ok(d) => d,
-        Err(e) => return db_error_page(e),
+        Err(e) => return util::db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(
@@ -185,7 +186,7 @@ fn edit_game_set_value(
         ),
     } {
         Ok(()) => (),
-        Err(e) => return db_error_page(e),
+        Err(e) => return util::db_error_page(e),
     };
 
     edit_game_response(game_id_str)
@@ -207,7 +208,7 @@ fn edit_game_unset_value(
         TerrainOrCharacter::Character => db.unset_game_character(game_id),
     } {
         Ok(()) => (),
-        Err(e) => return db_error_page(e),
+        Err(e) => return util::db_error_page(e),
     };
 
     edit_game_response(game_id_str)
@@ -227,7 +228,7 @@ fn move_cursor(
 
     let mut game = match db.get_game(game_id) {
         Ok(d) => d,
-        Err(e) => return internal_server_error(e),
+        Err(e) => return util::internal_server_error(e),
     };
 
     let direction = match models::Direction::parse(direction_str) {
@@ -239,7 +240,7 @@ fn move_cursor(
 
     match db.update_game_cursor(game.id, game.current_selection) {
         Ok(()) => (),
-        Err(e) => return internal_server_error(e),
+        Err(e) => return util::internal_server_error(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(if edit {
@@ -247,30 +248,6 @@ fn move_cursor(
     } else {
         html::game(game)
     }))))
-}
-
-fn db_error_page(e: db::DBError) -> Result<Response<Body>, hyper::Error> {
-    match e {
-        db::DBError::FindingTable(_) => internal_server_error(e),
-        db::DBError::ParsingRecord(_) => internal_server_error(e),
-        db::DBError::FindingRecord(_) => not_found_response(),
-        db::DBError::Internal(_) => internal_server_error(e),
-    }
-}
-
-fn not_found_response() -> Result<Response<Body>, hyper::Error> {
-    let mut not_found = Response::new(Body::from(html::render_page(html::not_found())));
-    *not_found.status_mut() = StatusCode::NOT_FOUND;
-    Ok(not_found)
-}
-
-fn internal_server_error<T: std::fmt::Debug>(
-    log_message: T,
-) -> Result<Response<Body>, hyper::Error> {
-    println!("internal server error: {:?}", log_message);
-    let mut not_found = Response::new(Body::from(html::render_page(html::internal_server_error())));
-    *not_found.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
-    Ok(not_found)
 }
 
 fn bad_request_response<T: Into<String>>(message: T) -> Result<Response<Body>, hyper::Error> {
@@ -326,8 +303,8 @@ pub fn serve_file(path: String) -> Result<Response<Body>, hyper::Error> {
     let mut f = match File::open(path) {
         Ok(file) => file,
         Err(e) => match e.kind() {
-            ErrorKind::NotFound => return not_found_response(),
-            _ => return internal_server_error(format!("file open failed: {:?}", e)),
+            ErrorKind::NotFound => return util::not_found_response(),
+            _ => return util::internal_server_error(format!("file open failed: {:?}", e)),
         },
     };
 
@@ -335,7 +312,7 @@ pub fn serve_file(path: String) -> Result<Response<Body>, hyper::Error> {
 
     match f.read_to_end(&mut source) {
         Ok(_) => (),
-        Err(e) => return internal_server_error(format!("file read to end failed: {:?}", e)),
+        Err(e) => return util::internal_server_error(format!("file read to end failed: {:?}", e)),
     };
 
     Ok(Response::new(Body::from(source)))
