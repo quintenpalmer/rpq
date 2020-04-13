@@ -7,6 +7,7 @@ use crate::html;
 use crate::models;
 
 use super::game_list;
+use super::game_single;
 use super::index;
 use super::map_list;
 use super::map_single;
@@ -37,7 +38,7 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 
         (&Method::GET, ["games"]) => game_list::handle_get(),
         (&Method::POST, ["games"]) => game_list::handle_post(),
-        (&Method::GET, ["games", game_id]) => game_response(game_id),
+        (&Method::GET, ["games", game_id]) => game_single::handle_get(game_id),
         (&Method::GET, ["games", game_id, "edit"]) => edit_game_response(game_id),
         (&Method::POST, ["games", game_id, "edit", "character", character_str]) => {
             edit_game_set_value(game_id, TerrainOrCharacter::Character, character_str)
@@ -72,24 +73,6 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 enum TerrainOrCharacter {
     Terrain,
     Character,
-}
-
-fn game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
-    let db = db::DB::new();
-
-    let game_id = match game_id_str.parse::<u32>() {
-        Ok(v) => v,
-        Err(_e) => return util::bad_request_response("must supply game id as u32"),
-    };
-
-    let game = match db.get_game(game_id) {
-        Ok(d) => d,
-        Err(e) => return util::db_error_page(e),
-    };
-
-    Ok(Response::new(Body::from(html::render_page(html::game(
-        game,
-    )))))
 }
 
 fn edit_game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
