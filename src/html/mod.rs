@@ -9,8 +9,8 @@ use htmldsl::TagRenderableIntoElement;
 use super::models;
 
 pub mod common;
-pub mod game_list;
 pub mod index;
+pub mod pages;
 mod shared;
 mod util;
 

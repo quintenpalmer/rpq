@@ -6,7 +6,7 @@ use htmldsl::TagRenderableIntoElement;
 
 use crate::models;
 
-use super::shared;
+use crate::html::shared;
 
 pub fn page<'a>(games: Vec<models::Game>) -> elements::Body<'a> {
     elements::Body::style_less(vec![
