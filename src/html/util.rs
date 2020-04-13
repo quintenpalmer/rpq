@@ -4,7 +4,7 @@ use htmldsl::styles;
 use htmldsl::units;
 use htmldsl::{TagRenderableIntoElement, TagRenderableStyleSetter};
 
-use super::models;
+use crate::models;
 
 pub fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
     match maybe {
