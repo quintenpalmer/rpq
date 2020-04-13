@@ -9,6 +9,7 @@ use htmldsl::{TagRenderableIntoElement, TagRenderableStyleSetter};
 use super::models;
 
 pub mod common;
+mod shared;
 mod util;
 
 pub use util::render_page;
@@ -307,16 +308,16 @@ fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
 
 pub fn index<'a>() -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        common::index_link(),
-        common::games_link(),
-        common::maps_link(),
+        shared::index_link(),
+        shared::games_link(),
+        shared::maps_link(),
     ])
 }
 
 pub fn games<'a>(games: Vec<models::Game>) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        common::index_link(),
-        common::games_link(),
+        shared::index_link(),
+        shared::games_link(),
         elements::Div::style_less(
             games
                 .into_iter()
@@ -352,8 +353,8 @@ pub fn games<'a>(games: Vec<models::Game>) -> elements::Body<'a> {
 
 pub fn maps<'a>(maps: Vec<models::Map>) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        common::index_link(),
-        common::maps_link(),
+        shared::index_link(),
+        shared::maps_link(),
         elements::Div::style_less(
             maps.into_iter()
                 .map(|map| {
@@ -388,8 +389,8 @@ pub fn maps<'a>(maps: Vec<models::Map>) -> elements::Body<'a> {
 
 pub fn map<'a>(map: models::Map) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        common::index_link(),
-        common::maps_link(),
+        shared::index_link(),
+        shared::maps_link(),
         elements::H3::style_less(vec![elements::A::style_less(
             attributes::Href {
                 value: units::SourceValue::new(format!("/maps/{}", map.id)),
@@ -404,8 +405,8 @@ pub fn map<'a>(map: models::Map) -> elements::Body<'a> {
 
 pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        common::index_link(),
-        common::games_link(),
+        shared::index_link(),
+        shared::games_link(),
         elements::H3::style_less(vec![
             elements::A::style_less(
                 attributes::Href {
@@ -433,8 +434,8 @@ pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
 
 pub fn edit_game<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
-        common::index_link(),
-        common::games_link(),
+        shared::index_link(),
+        shared::games_link(),
         elements::H3::style_less(vec![
             elements::A::style_less(
                 attributes::Href {
