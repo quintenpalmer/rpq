@@ -41,17 +41,17 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         (&Method::GET, ["games", game_id]) => game_single::handle_get(game_id),
         (&Method::GET, ["games", game_id, "edit"]) => edit_game_response(game_id),
         (&Method::POST, ["games", game_id, "edit", "character", character_str]) => {
-            edit_game_set_value(game_id, TerrainOrCharacter::Character, character_str)
+            edit_game_set_value(game_id, util::TerrainOrCharacter::Character, character_str)
         }
         (&Method::POST, ["games", game_id, "edit", "terrain", terrain_str]) => {
-            edit_game_set_value(game_id, TerrainOrCharacter::Terrain, terrain_str)
+            edit_game_set_value(game_id, util::TerrainOrCharacter::Terrain, terrain_str)
         }
 
         (&Method::POST, ["games", game_id, "edit", "unset", "character"]) => {
-            edit_game_unset_value(game_id, TerrainOrCharacter::Character)
+            edit_game_unset_value(game_id, util::TerrainOrCharacter::Character)
         }
         (&Method::POST, ["games", game_id, "edit", "unset", "terrain"]) => {
-            edit_game_unset_value(game_id, TerrainOrCharacter::Terrain)
+            edit_game_unset_value(game_id, util::TerrainOrCharacter::Terrain)
         }
 
         (&Method::POST, ["games", game_id, "edit", "cursor", direction]) => {
@@ -68,11 +68,6 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Return the 404 Not Found for other routes.
         _ => util::not_found_response(),
     }
-}
-
-enum TerrainOrCharacter {
-    Terrain,
-    Character,
 }
 
 fn edit_game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
@@ -95,7 +90,7 @@ fn edit_game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error>
 
 fn edit_game_set_value(
     game_id_str: &str,
-    value_type: TerrainOrCharacter,
+    value_type: util::TerrainOrCharacter,
     value_value: &str,
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
@@ -106,14 +101,14 @@ fn edit_game_set_value(
     };
 
     match match value_type {
-        TerrainOrCharacter::Terrain => db.update_game_terrain(
+        util::TerrainOrCharacter::Terrain => db.update_game_terrain(
             game_id,
             match models::Terrain::parse_str(value_value) {
                 Some(v) => v,
                 None => return util::bad_request_response("terrain in path invalid"),
             },
         ),
-        TerrainOrCharacter::Character => db.update_game_character(
+        util::TerrainOrCharacter::Character => db.update_game_character(
             game_id,
             match models::Character::parse_str(value_value) {
                 Some(v) => v,
@@ -130,7 +125,7 @@ fn edit_game_set_value(
 
 fn edit_game_unset_value(
     game_id_str: &str,
-    value_type: TerrainOrCharacter,
+    value_type: util::TerrainOrCharacter,
 ) -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
 
@@ -140,8 +135,8 @@ fn edit_game_unset_value(
     };
 
     match match value_type {
-        TerrainOrCharacter::Terrain => db.unset_game_terrain(game_id),
-        TerrainOrCharacter::Character => db.unset_game_character(game_id),
+        util::TerrainOrCharacter::Terrain => db.unset_game_terrain(game_id),
+        util::TerrainOrCharacter::Character => db.unset_game_character(game_id),
     } {
         Ok(()) => (),
         Err(e) => return util::db_error_page(e),

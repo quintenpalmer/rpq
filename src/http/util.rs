@@ -3,6 +3,11 @@ use hyper::{Body, Response, StatusCode};
 use crate::db;
 use crate::html;
 
+pub enum TerrainOrCharacter {
+    Terrain,
+    Character,
+}
+
 pub fn db_error_page(e: db::DBError) -> Result<Response<Body>, hyper::Error> {
     match e {
         db::DBError::FindingTable(_) => internal_server_error(e),
