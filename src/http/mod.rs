@@ -1,3 +1,4 @@
+mod cursor_move;
 mod game_list;
 mod game_single;
 mod image_serve;

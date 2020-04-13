@@ -4,6 +4,7 @@ use crate::db;
 use crate::html;
 use crate::models;
 
+use super::cursor_move;
 use super::game_list;
 use super::game_single;
 use super::image_serve;
@@ -54,11 +55,11 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         }
 
         (&Method::POST, ["games", game_id, "edit", "cursor", direction]) => {
-            move_cursor(game_id, direction, true)
+            cursor_move::handle_post(game_id, direction, true)
         }
 
         (&Method::POST, ["games", game_id, "cursor", direction]) => {
-            move_cursor(game_id, direction, false)
+            cursor_move::handle_post(game_id, direction, false)
         }
 
         // Serve hard-coded images
@@ -147,42 +148,4 @@ fn edit_game_unset_value(
     };
 
     edit_game_response(game_id_str)
-}
-
-fn move_cursor(
-    game_id_str: &str,
-    direction_str: &str,
-    edit: bool,
-) -> Result<Response<Body>, hyper::Error> {
-    let db = db::DB::new();
-
-    let game_id = match game_id_str.parse::<u32>() {
-        Ok(v) => v,
-        Err(_e) => return util::bad_request_response("must supply map id as u32"),
-    };
-
-    let mut game = match db.get_game(game_id) {
-        Ok(d) => d,
-        Err(e) => return util::internal_server_error(e),
-    };
-
-    let direction = match models::Direction::parse(direction_str) {
-        Some(d) => d,
-        None => {
-            return util::bad_request_response("direction must be one of right, up, left, down")
-        }
-    };
-
-    game.move_cursor(direction);
-
-    match db.update_game_cursor(game.id, game.current_selection) {
-        Ok(()) => (),
-        Err(e) => return util::internal_server_error(e),
-    };
-
-    Ok(Response::new(Body::from(html::render_page(if edit {
-        html::edit_game(game)
-    } else {
-        html::game(game)
-    }))))
 }
