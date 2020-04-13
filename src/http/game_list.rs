@@ -12,9 +12,9 @@ pub fn handle_get() -> Result<Response<Body>, hyper::Error> {
         Err(e) => return util::db_error_page(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(html::games(
-        games,
-    )))))
+    Ok(Response::new(Body::from(html::common::render_page(
+        html::games(games),
+    ))))
 }
 
 pub fn handle_post() -> Result<Response<Body>, hyper::Error> {

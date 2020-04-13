@@ -37,9 +37,11 @@ pub fn handle_post(
         Err(e) => return util::internal_server_error(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(if edit {
-        html::edit_game(game)
-    } else {
-        html::game(game)
-    }))))
+    Ok(Response::new(Body::from(html::common::render_page(
+        if edit {
+            html::edit_game(game)
+        } else {
+            html::game(game)
+        },
+    ))))
 }

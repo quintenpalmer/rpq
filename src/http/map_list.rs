@@ -12,7 +12,7 @@ pub fn handle_get() -> Result<Response<Body>, hyper::Error> {
         Err(e) => return util::db_error_page(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(html::maps(
-        games,
-    )))))
+    Ok(Response::new(Body::from(html::common::render_page(
+        html::maps(games),
+    ))))
 }

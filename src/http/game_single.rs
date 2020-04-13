@@ -18,7 +18,7 @@ pub fn handle_get(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
         Err(e) => return util::db_error_page(e),
     };
 
-    Ok(Response::new(Body::from(html::render_page(html::game(
-        game,
-    )))))
+    Ok(Response::new(Body::from(html::common::render_page(
+        html::game(game),
+    ))))
 }

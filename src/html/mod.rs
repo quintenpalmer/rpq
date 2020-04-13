@@ -13,8 +13,6 @@ pub mod index;
 mod shared;
 mod util;
 
-pub use util::render_page;
-
 fn current_selection_marker<'a>() -> elements::Img<'a> {
     elements::Img::style_less_with_src("/images/marker.png".to_string())
 }
