@@ -13,7 +13,7 @@ pub fn handle_get() -> Result<Response<Body>, hyper::Error> {
     };
 
     Ok(Response::new(Body::from(html::common::render_page(
-        html::games(games),
+        html::game_list::page(games),
     ))))
 }
 
