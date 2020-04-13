@@ -7,6 +7,7 @@ use crate::html;
 use crate::models;
 
 use super::index;
+use super::map_list;
 use super::util;
 
 /// This is our service handler. It receives a Request, routes on its
@@ -29,7 +30,7 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Serve some instructions at /
         (&Method::GET, []) => index::handle_get(),
 
-        (&Method::GET, ["maps"]) => maps_response(),
+        (&Method::GET, ["maps"]) => map_list::handle_get(),
         (&Method::GET, ["maps", map_id]) => map_response(map_id),
 
         (&Method::GET, ["games"]) => games_response(),
@@ -69,18 +70,6 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 enum TerrainOrCharacter {
     Terrain,
     Character,
-}
-
-fn maps_response() -> Result<Response<Body>, hyper::Error> {
-    let db = db::DB::new();
-    let games = match db.get_maps() {
-        Ok(d) => d,
-        Err(e) => return util::db_error_page(e),
-    };
-
-    Ok(Response::new(Body::from(html::render_page(html::maps(
-        games,
-    )))))
 }
 
 fn map_response(map_id_str: &str) -> Result<Response<Body>, hyper::Error> {
