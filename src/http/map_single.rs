@@ -19,6 +19,6 @@ pub fn handle_get(map_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     };
 
     Ok(Response::new(Body::from(html::common::render_page(
-        html::map(map),
+        html::pages::map_single::page(map),
     ))))
 }
