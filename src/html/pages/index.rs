@@ -1,6 +1,6 @@
 use htmldsl::elements;
 
-use super::shared;
+use crate::html::shared;
 
 pub fn page<'a>() -> elements::Body<'a> {
     elements::Body::style_less(vec![
