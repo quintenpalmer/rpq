@@ -101,8 +101,8 @@ impl models::Map {
                             row.into_iter()
                                 .map(|data| {
                                     elements::Td::style_less(vec![elements::Div::style_less(
-                                        maybe_append(
-                                            maybe_append(
+                                        util::maybe_append(
+                                            util::maybe_append(
                                                 vec![data
                                                     .0
                                                     .into_html()
@@ -139,7 +139,7 @@ impl models::Game {
         let o_character = self.character_at(&self.current_selection);
 
         let hover_info = elements::Div::style_less(vec![
-            elements::P::style_less(maybe_append(
+            elements::P::style_less(util::maybe_append(
                 vec![
                     terrain.clone().into_html().into_element(),
                     htmldsl::text("Terrain: ".into()),
@@ -152,7 +152,7 @@ impl models::Game {
                 },
             ))
             .into_element(),
-            elements::P::style_less(maybe_append(
+            elements::P::style_less(util::maybe_append(
                 vec![
                     o_character
                         .clone()
@@ -295,16 +295,6 @@ fn build_character_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
             )
             .collect(),
     )
-}
-
-fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
-    match maybe {
-        Some(v) => {
-            vec.push(v);
-            vec
-        }
-        None => vec,
-    }
 }
 
 pub fn games<'a>(games: Vec<models::Game>) -> elements::Body<'a> {

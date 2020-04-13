@@ -63,3 +63,13 @@ pub fn render_page<'a>(body: elements::Body<'a>) -> String {
 
     htmldsl::render_simple_html_page(true, html)
 }
+
+pub fn maybe_append<T>(mut vec: Vec<T>, maybe: Option<T>) -> Vec<T> {
+    match maybe {
+        Some(v) => {
+            vec.push(v);
+            vec
+        }
+        None => vec,
+    }
+}
