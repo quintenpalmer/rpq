@@ -4,6 +4,10 @@
 
 RPQ is an RPG proof-of-concept web application.
 
+## Reason for Name
+
+It's an RPG, but instead of a G it's a Q. My first name is Quinten and I often like to replace G with Q as they look similar both in uppercase (G vs Q) and lowercase (g vs q).
+
 ## Anatomy of the Project
 
 ```
