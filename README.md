@@ -35,3 +35,7 @@ Obviously it's pretty wild to request the entire page for each action,
 and storing information like the client cursor information on the server.
 This is a kind of proof-of-concept of how far I can take building an old-school web application,
 just using HTML/HTTP to build pages to send to clients which render and then request more pages.
+
+## Screenshot
+
+![Screenshot of game web app](/screenshots/edit_mode_map_game.gif)
