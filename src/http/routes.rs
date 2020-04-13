@@ -1,4 +1,4 @@
-use hyper::{Body, Method, Request, Response, StatusCode};
+use hyper::{Body, Method, Request, Response};
 use std::fs::File;
 use std::io::{ErrorKind, Read};
 
@@ -88,7 +88,7 @@ fn map_response(map_id_str: &str) -> Result<Response<Body>, hyper::Error> {
 
     let map_id = match map_id_str.parse::<u32>() {
         Ok(v) => v,
-        Err(_e) => return bad_request_response("must supply map id as u32"),
+        Err(_e) => return util::bad_request_response("must supply map id as u32"),
     };
 
     let map = match db.get_map(map_id) {
@@ -126,7 +126,7 @@ fn game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
 
     let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
-        Err(_e) => return bad_request_response("must supply game id as u32"),
+        Err(_e) => return util::bad_request_response("must supply game id as u32"),
     };
 
     let game = match db.get_game(game_id) {
@@ -144,7 +144,7 @@ fn edit_game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error>
 
     let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
-        Err(_e) => return bad_request_response("must supply map id as u32"),
+        Err(_e) => return util::bad_request_response("must supply map id as u32"),
     };
 
     let game = match db.get_game(game_id) {
@@ -166,7 +166,7 @@ fn edit_game_set_value(
 
     let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
-        Err(_e) => return bad_request_response("must supply map id as u32"),
+        Err(_e) => return util::bad_request_response("must supply map id as u32"),
     };
 
     match match value_type {
@@ -174,14 +174,14 @@ fn edit_game_set_value(
             game_id,
             match models::Terrain::parse_str(value_value) {
                 Some(v) => v,
-                None => return bad_request_response("terrain in path invalid"),
+                None => return util::bad_request_response("terrain in path invalid"),
             },
         ),
         TerrainOrCharacter::Character => db.update_game_character(
             game_id,
             match models::Character::parse_str(value_value) {
                 Some(v) => v,
-                None => return bad_request_response("character in path invalid"),
+                None => return util::bad_request_response("character in path invalid"),
             },
         ),
     } {
@@ -200,7 +200,7 @@ fn edit_game_unset_value(
 
     let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
-        Err(_e) => return bad_request_response("must supply map id as u32"),
+        Err(_e) => return util::bad_request_response("must supply map id as u32"),
     };
 
     match match value_type {
@@ -223,7 +223,7 @@ fn move_cursor(
 
     let game_id = match game_id_str.parse::<u32>() {
         Ok(v) => v,
-        Err(_e) => return bad_request_response("must supply map id as u32"),
+        Err(_e) => return util::bad_request_response("must supply map id as u32"),
     };
 
     let mut game = match db.get_game(game_id) {
@@ -233,7 +233,9 @@ fn move_cursor(
 
     let direction = match models::Direction::parse(direction_str) {
         Some(d) => d,
-        None => return bad_request_response("direction must be one of right, up, left, down"),
+        None => {
+            return util::bad_request_response("direction must be one of right, up, left, down")
+        }
     };
 
     game.move_cursor(direction);
@@ -248,12 +250,6 @@ fn move_cursor(
     } else {
         html::game(game)
     }))))
-}
-
-fn bad_request_response<T: Into<String>>(message: T) -> Result<Response<Body>, hyper::Error> {
-    let mut not_found = Response::new(Body::from(html::render_page(html::bad_request(message))));
-    *not_found.status_mut() = StatusCode::BAD_REQUEST;
-    Ok(not_found)
 }
 
 pub enum ImageFileType {
@@ -271,17 +267,17 @@ impl ImageFileType {
 fn serve_image(file_name: &str) -> Result<Response<Body>, hyper::Error> {
     let (name, suffix) = match file_name.split('.').collect::<Vec<&str>>().as_slice() {
         &[name, suffix] => (name, suffix),
-        _ => return bad_request_response("images must be 'file.ext'"),
+        _ => return util::bad_request_response("images must be 'file.ext'"),
     };
 
     let ext = match suffix {
         "png" => ImageFileType::PNG,
-        _ => return bad_request_response("only .png image file type is supported"),
+        _ => return util::bad_request_response("only .png image file type is supported"),
     };
 
     match validate_file_name(name) {
         Ok(()) => (),
-        Err(e) => return bad_request_response(format!("image file invalid: {}", e)),
+        Err(e) => return util::bad_request_response(format!("image file invalid: {}", e)),
     };
     serve_file(format!("images/{}.{}", name, ext.extension()))
 }

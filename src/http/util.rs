@@ -26,3 +26,9 @@ pub fn not_found_response() -> Result<Response<Body>, hyper::Error> {
     *not_found.status_mut() = StatusCode::NOT_FOUND;
     Ok(not_found)
 }
+
+pub fn bad_request_response<T: Into<String>>(message: T) -> Result<Response<Body>, hyper::Error> {
+    let mut not_found = Response::new(Body::from(html::render_page(html::bad_request(message))));
+    *not_found.status_mut() = StatusCode::BAD_REQUEST;
+    Ok(not_found)
+}
