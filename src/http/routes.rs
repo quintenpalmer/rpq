@@ -6,6 +6,8 @@ use crate::db;
 use crate::html;
 use crate::models;
 
+use super::index;
+
 /// This is our service handler. It receives a Request, routes on its
 /// path, and returns a Future of a Response.
 pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
@@ -24,7 +26,7 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
     );
     match (req.method(), path_frags.as_slice()) {
         // Serve some instructions at /
-        (&Method::GET, []) => index_response(),
+        (&Method::GET, []) => index::handle_get(),
 
         (&Method::GET, ["maps"]) => maps_response(),
         (&Method::GET, ["maps", map_id]) => map_response(map_id),
@@ -66,10 +68,6 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
 enum TerrainOrCharacter {
     Terrain,
     Character,
-}
-
-fn index_response() -> Result<Response<Body>, hyper::Error> {
-    Ok(Response::new(Body::from(html::render_page(html::index()))))
 }
 
 fn maps_response() -> Result<Response<Body>, hyper::Error> {
