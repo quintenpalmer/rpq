@@ -39,7 +39,7 @@ pub fn handle_post(
 
     Ok(Response::new(Body::from(html::common::render_page(
         if edit {
-            html::edit_game(game)
+            html::pages::game_edit::page(game)
         } else {
             html::pages::game_single::page(game)
         },

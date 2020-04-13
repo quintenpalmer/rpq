@@ -20,7 +20,7 @@ pub fn handle_get(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
     };
 
     Ok(Response::new(Body::from(html::common::render_page(
-        html::edit_game(game),
+        html::pages::game_edit::page(game),
     ))))
 }
 
