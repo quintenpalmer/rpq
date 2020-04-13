@@ -1,3 +1,4 @@
+mod game_list;
 mod index;
 mod map_list;
 mod map_single;
