@@ -6,7 +6,7 @@ mod image_serve;
 mod index;
 mod map_list;
 mod map_single;
-mod routes;
+mod route_map;
 mod util;
 
-pub use routes::service_handler;
+pub use route_map::service_handler;
