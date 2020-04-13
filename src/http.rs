@@ -76,7 +76,7 @@ fn maps_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
     let games = match db.get_maps() {
         Ok(d) => d,
-        Err(e) => return internal_server_error(e),
+        Err(e) => return db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::maps(
@@ -94,7 +94,7 @@ fn map_response(map_id_str: &str) -> Result<Response<Body>, hyper::Error> {
 
     let map = match db.get_map(map_id) {
         Ok(d) => d,
-        Err(e) => return internal_server_error(e),
+        Err(e) => return db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::map(map)))))
@@ -104,7 +104,7 @@ fn games_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
     let games = match db.get_games() {
         Ok(d) => d,
-        Err(e) => return internal_server_error(e),
+        Err(e) => return db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::games(
@@ -116,7 +116,7 @@ fn games_create_response() -> Result<Response<Body>, hyper::Error> {
     let db = db::DB::new();
     match db.add_game() {
         Ok(()) => (),
-        Err(e) => return internal_server_error(e),
+        Err(e) => return db_error_page(e),
     };
 
     games_response()
@@ -132,7 +132,7 @@ fn game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error> {
 
     let game = match db.get_game(game_id) {
         Ok(d) => d,
-        Err(e) => return internal_server_error(e),
+        Err(e) => return db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(html::game(
@@ -150,7 +150,7 @@ fn edit_game_response(game_id_str: &str) -> Result<Response<Body>, hyper::Error>
 
     let game = match db.get_game(game_id) {
         Ok(d) => d,
-        Err(e) => return internal_server_error(e),
+        Err(e) => return db_error_page(e),
     };
 
     Ok(Response::new(Body::from(html::render_page(
@@ -187,9 +187,7 @@ fn edit_game_set_value(
         ),
     } {
         Ok(()) => (),
-        Err(e) => {
-            return internal_server_error(format!("could not update terrain or character: {:?}", e))
-        }
+        Err(e) => return db_error_page(e),
     };
 
     edit_game_response(game_id_str)
@@ -211,9 +209,7 @@ fn edit_game_unset_value(
         TerrainOrCharacter::Character => db.unset_game_character(game_id),
     } {
         Ok(()) => (),
-        Err(e) => {
-            return internal_server_error(format!("could not unset terrain or character: {:?}", e))
-        }
+        Err(e) => return db_error_page(e),
     };
 
     edit_game_response(game_id_str)
@@ -253,6 +249,15 @@ fn move_cursor(
     } else {
         html::game(game)
     }))))
+}
+
+fn db_error_page(e: db::DBError) -> Result<Response<Body>, hyper::Error> {
+    match e {
+        db::DBError::FindingTable(_) => internal_server_error(e),
+        db::DBError::ParsingRecord(_) => internal_server_error(e),
+        db::DBError::FindingRecord(_) => not_found_response(),
+        db::DBError::Internal(_) => internal_server_error(e),
+    }
 }
 
 fn not_found_response() -> Result<Response<Body>, hyper::Error> {
