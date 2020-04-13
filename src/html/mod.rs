@@ -8,7 +8,7 @@ use htmldsl::{TagRenderableIntoElement, TagRenderableStyleSetter};
 
 use super::models;
 
-mod common;
+pub mod common;
 mod util;
 
 pub use util::render_page;
@@ -478,25 +478,4 @@ fn cursor_form_button(game_id: u32, dir: models::Direction, edit: bool) -> htmld
         styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
     }
     .into_element()
-}
-
-pub fn not_found<'a>() -> elements::Body<'a> {
-    elements::Body::style_less(vec![elements::H1::style_less(vec![htmldsl::text(
-        "not found".into(),
-    )])
-    .into_element()])
-}
-
-pub fn internal_server_error<'a>() -> elements::Body<'a> {
-    elements::Body::style_less(vec![elements::H1::style_less(vec![htmldsl::text(
-        "internal server error".into(),
-    )])
-    .into_element()])
-}
-
-pub fn bad_request<'a, T: Into<String>>(message: T) -> elements::Body<'a> {
-    elements::Body::style_less(vec![
-        elements::H1::style_less(vec![htmldsl::text("bad request".into())]).into_element(),
-        elements::P::style_less(vec![htmldsl::text(message.into())]).into_element(),
-    ])
 }
