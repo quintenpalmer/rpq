@@ -406,10 +406,10 @@ pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
         ])
         .into_element(),
         game.into_html(false),
-        cursor_form_button(game.id, models::Direction::Left, false),
-        cursor_form_button(game.id, models::Direction::Up, false),
-        cursor_form_button(game.id, models::Direction::Down, false),
-        cursor_form_button(game.id, models::Direction::Right, false),
+        util::cursor_form_button(game.id, models::Direction::Left, false),
+        util::cursor_form_button(game.id, models::Direction::Up, false),
+        util::cursor_form_button(game.id, models::Direction::Down, false),
+        util::cursor_form_button(game.id, models::Direction::Right, false),
     ])
 }
 
@@ -435,29 +435,9 @@ pub fn edit_game<'a>(game: models::Game) -> elements::Body<'a> {
         ])
         .into_element(),
         game.into_html(true),
-        cursor_form_button(game.id, models::Direction::Left, true),
-        cursor_form_button(game.id, models::Direction::Up, true),
-        cursor_form_button(game.id, models::Direction::Down, true),
-        cursor_form_button(game.id, models::Direction::Right, true),
+        util::cursor_form_button(game.id, models::Direction::Left, true),
+        util::cursor_form_button(game.id, models::Direction::Up, true),
+        util::cursor_form_button(game.id, models::Direction::Down, true),
+        util::cursor_form_button(game.id, models::Direction::Right, true),
     ])
-}
-
-fn cursor_form_button(game_id: u32, dir: models::Direction, edit: bool) -> htmldsl::Element {
-    let (url_frag, symbol) = dir.form_strings();
-    elements::Form {
-        formmethod: attributes::Formmethod {
-            inner: units::FormmethodValue::Post,
-        },
-        action: Some(attributes::Action {
-            value: units::SourceValue::new(if edit {
-                format!("/games/{}/edit/cursor/{}", game_id, url_frag)
-            } else {
-                format!("/games/{}/cursor/{}", game_id, url_frag)
-            }),
-        }),
-        inputs: Vec::new(),
-        button: elements::Button::style_less(htmldsl::text(symbol.into())),
-        styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
-    }
-    .into_element()
 }
