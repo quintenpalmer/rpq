@@ -41,7 +41,7 @@ pub fn handle_post(
         if edit {
             html::edit_game(game)
         } else {
-            html::game(game)
+            html::pages::game_single::page(game)
         },
     ))))
 }

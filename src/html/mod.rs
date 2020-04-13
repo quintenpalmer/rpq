@@ -66,35 +66,6 @@ pub fn map<'a>(map: models::Map) -> elements::Body<'a> {
     ])
 }
 
-pub fn game<'a>(game: models::Game) -> elements::Body<'a> {
-    elements::Body::style_less(vec![
-        shared::index_link(),
-        shared::games_link(),
-        elements::H3::style_less(vec![
-            elements::A::style_less(
-                attributes::Href {
-                    value: units::SourceValue::new(format!("/games/{}", game.id)),
-                },
-                vec![htmldsl::text("this game".into())],
-            )
-            .into_element(),
-            elements::A::style_less(
-                attributes::Href {
-                    value: units::SourceValue::new(format!("/games/{}/edit", game.id)),
-                },
-                vec![htmldsl::text("edit".into())],
-            )
-            .into_element(),
-        ])
-        .into_element(),
-        game.into_html(false),
-        util::cursor_form_button(game.id, models::Direction::Left, false),
-        util::cursor_form_button(game.id, models::Direction::Up, false),
-        util::cursor_form_button(game.id, models::Direction::Down, false),
-        util::cursor_form_button(game.id, models::Direction::Right, false),
-    ])
-}
-
 pub fn edit_game<'a>(game: models::Game) -> elements::Body<'a> {
     elements::Body::style_less(vec![
         shared::index_link(),
