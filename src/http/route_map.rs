@@ -23,6 +23,12 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         // Serve hard-coded images
         (&Method::GET, ["images", name]) => routes::image_serve::handle_get(name),
 
+        (method, frags) => handle_pages(method, frags),
+    }
+}
+
+fn handle_pages(method: &Method, frags: &[&str]) -> Result<Response<Body>, hyper::Error> {
+    match (method, frags) {
         // Serve some instructions at /
         (&Method::GET, []) => routes::index::handle_get(),
 
