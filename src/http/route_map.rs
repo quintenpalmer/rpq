@@ -1,4 +1,4 @@
-use hyper::{Body, Method, Request, Response};
+use hyper::{header, Body, Method, Request, Response};
 
 use super::routes;
 use super::util;
@@ -73,4 +73,11 @@ fn handle_pages(method: &Method, frags: &[&str]) -> Result<Response<Body>, hyper
         // Return the 404 Not Found for other routes.
         _ => util::not_found_response(),
     }
+    .map(|mut resp| {
+        resp.headers_mut().insert(
+            header::CONTENT_TYPE,
+            header::HeaderValue::from_static("text/html"),
+        );
+        resp
+    })
 }
