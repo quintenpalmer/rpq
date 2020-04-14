@@ -20,6 +20,9 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         req.method()
     );
     match (req.method(), path_frags.as_slice()) {
+        // Serve hard-coded images
+        (&Method::GET, ["images", name]) => routes::image_serve::handle_get(name),
+
         // Serve some instructions at /
         (&Method::GET, []) => routes::index::handle_get(),
 
@@ -60,9 +63,6 @@ pub async fn service_handler(req: Request<Body>) -> Result<Response<Body>, hyper
         (&Method::POST, ["games", game_id, "cursor", direction]) => {
             routes::cursor_move::handle_post(game_id, direction, false)
         }
-
-        // Serve hard-coded images
-        (&Method::GET, ["images", name]) => routes::image_serve::handle_get(name),
 
         // Return the 404 Not Found for other routes.
         _ => util::not_found_response(),
