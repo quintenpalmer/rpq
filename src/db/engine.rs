@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::models;
 
+use super::common::DBError;
+
 const GAME_DB_FILE_NAME: &'static str = "db/game.csv";
 const MAP_DB_FILE_NAME: &'static str = "db/map.csv";
 const TILES_DB_FILE_NAME: &'static str = "db/tiles.csv";
@@ -17,14 +19,6 @@ const ALL_DB_FILE_NAMES: &'static [&'static str] = &[
     TILES_DB_FILE_NAME,
     CHARACTER_DB_FILE_NAME,
 ];
-
-#[derive(Debug)]
-pub enum DBError {
-    FindingTable(String),
-    ParsingRecord(String),
-    FindingRecord(String),
-    Internal(std::io::Error),
-}
 
 #[derive(Serialize, Deserialize, Clone)]
 struct DBGame {

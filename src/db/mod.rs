@@ -1,3 +1,5 @@
+mod common;
 mod engine;
 
-pub use engine::{DBError, DB};
+pub use common::DBError;
+pub use engine::DB;
