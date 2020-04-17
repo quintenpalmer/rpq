@@ -85,21 +85,6 @@ impl DB {
         self.engine.read_db_records(GAME_DB_FILE_NAME)
     }
 
-    pub fn get_maps(&self) -> Result<Vec<models::Map>, DBError> {
-        Ok(self
-            .read_db_maps()?
-            .into_iter()
-            .map(|map| {
-                let tiles = self.read_db_tile_lines_for_map_id(map.id)?;
-                Ok(map_model_from_db(map, tiles))
-            })
-            .collect::<Result<Vec<models::Map>, DBError>>()?)
-    }
-
-    pub fn get_map(&self, map_id: u32) -> Result<models::Map, DBError> {
-        get_single_result(self.get_maps()?, |record| record.id == map_id, "maps")
-    }
-
     pub fn add_game(&self) -> Result<(), DBError> {
         let map = self.add_db_map()?;
 
@@ -117,6 +102,21 @@ impl DB {
 
         self.engine
             .write_replace_records(GAME_DB_FILE_NAME, records)
+    }
+
+    pub fn get_maps(&self) -> Result<Vec<models::Map>, DBError> {
+        Ok(self
+            .read_db_maps()?
+            .into_iter()
+            .map(|map| {
+                let tiles = self.read_db_tile_lines_for_map_id(map.id)?;
+                Ok(map_model_from_db(map, tiles))
+            })
+            .collect::<Result<Vec<models::Map>, DBError>>()?)
+    }
+
+    pub fn get_map(&self, map_id: u32) -> Result<models::Map, DBError> {
+        get_single_result(self.get_maps()?, |record| record.id == map_id, "maps")
     }
 
     fn add_db_map(&self) -> Result<DBMap, DBError> {
