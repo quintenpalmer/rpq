@@ -51,7 +51,7 @@ pub fn serve_file(path: String) -> Result<Response<Body>, hyper::Error> {
     let mut f = match File::open(path) {
         Ok(file) => file,
         Err(e) => match e.kind() {
-            ErrorKind::NotFound => return util::not_found_response(),
+            ErrorKind::NotFound => return util::not_found_response(e),
             _ => return util::internal_server_error(format!("file open failed: {:?}", e)),
         },
     };

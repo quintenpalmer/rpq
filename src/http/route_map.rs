@@ -71,7 +71,7 @@ fn handle_pages(method: &Method, frags: &[&str]) -> Result<Response<Body>, hyper
         }
 
         // Return the 404 Not Found for other routes.
-        _ => util::not_found_response(),
+        _ => util::not_found_response(frags),
     }
     .map(|mut resp| {
         resp.headers_mut().insert(
