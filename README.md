@@ -13,7 +13,10 @@ It's an RPG, but instead of a G it's a Q. My first name is Quinten and I often l
 ```
 src/
     models.rs - Canonical models for this RPG
-    db.rs - All database interactions, which are currently hand rolled csv interactions
+    db/
+        common.rs - Shared constructs for database logic (like error enum)
+        engine.rs - csv-backed logic to provide relational-ish interface
+        concrete.rs - Business-logic related data storage methods
     html/
         *.rs - Utilities to help with building the html pages to serve
         pages/
