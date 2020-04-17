@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::fs::File;
 
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 use super::models;
@@ -100,20 +101,7 @@ impl DB {
     }
 
     fn read_db_games(&self) -> Result<Vec<DBGame>, DBError> {
-        let mut rdr =
-            csv::Reader::from_reader(File::open(GAME_DB_FILE_NAME).map_err(|e| {
-                DBError::FindingTable(format!("could not read from file: {:?}", e))
-            })?);
-        let records = rdr
-            .deserialize()
-            .into_iter()
-            .map(|result| -> Result<DBGame, DBError> {
-                result.map_err(|e| {
-                    DBError::ParsingRecord(format!("could not read row for game: {:?}", e))
-                })
-            })
-            .collect::<Result<Vec<DBGame>, DBError>>()?;
-        Ok(records)
+        self.read_db_records(GAME_DB_FILE_NAME)
     }
 
     pub fn get_maps(&self) -> Result<Vec<models::Map>, DBError> {
@@ -184,20 +172,7 @@ impl DB {
     }
 
     fn read_db_maps(&self) -> Result<Vec<DBMap>, DBError> {
-        let mut rdr =
-            csv::Reader::from_reader(File::open(MAP_DB_FILE_NAME).map_err(|e| {
-                DBError::FindingTable(format!("could not read from file: {:?}", e))
-            })?);
-        let records = rdr
-            .deserialize()
-            .into_iter()
-            .map(|result| -> Result<DBMap, DBError> {
-                result.map_err(|e| {
-                    DBError::ParsingRecord(format!("could not read row for game: {:?}", e))
-                })
-            })
-            .collect::<Result<Vec<DBMap>, DBError>>()?;
-        Ok(records)
+        self.read_db_records(MAP_DB_FILE_NAME)
     }
 
     fn write_replace_records<S: Serialize>(
@@ -216,6 +191,24 @@ impl DB {
         };
 
         Ok(())
+    }
+
+    fn read_db_records<S: DeserializeOwned>(
+        &self,
+        db_file_name: &'static str,
+    ) -> Result<Vec<S>, DBError> {
+        let mut rdr =
+            csv::Reader::from_reader(File::open(db_file_name).map_err(|e| {
+                DBError::FindingTable(format!("could not read from file: {:?}", e))
+            })?);
+        let records = rdr
+            .deserialize()
+            .into_iter()
+            .map(|result| -> Result<S, DBError> {
+                result.map_err(|e| DBError::ParsingRecord(format!("could not read row: {:?}", e)))
+            })
+            .collect::<Result<Vec<S>, DBError>>()?;
+        Ok(records)
     }
 
     pub fn update_game_cursor(&self, id: u32, cursor: (u32, u32)) -> Result<(), DBError> {
@@ -244,20 +237,7 @@ impl DB {
     }
 
     fn read_db_tile_lines(&self) -> Result<Vec<DBTileLine>, DBError> {
-        let mut rdr =
-            csv::Reader::from_reader(File::open(TILES_DB_FILE_NAME).map_err(|e| {
-                DBError::FindingTable(format!("could not read from file: {:?}", e))
-            })?);
-        let records = rdr
-            .deserialize()
-            .into_iter()
-            .map(|result| -> Result<DBTileLine, DBError> {
-                result.map_err(|e| {
-                    DBError::ParsingRecord(format!("could not read row for record: {:?}", e))
-                })
-            })
-            .collect::<Result<Vec<DBTileLine>, DBError>>()?;
-        Ok(records)
+        self.read_db_records(TILES_DB_FILE_NAME)
     }
 
     fn read_db_characters_for_game_id(&self, game_id: u32) -> Result<Vec<DBCharacter>, DBError> {
@@ -269,20 +249,7 @@ impl DB {
     }
 
     fn read_db_characters(&self) -> Result<Vec<DBCharacter>, DBError> {
-        let mut rdr =
-            csv::Reader::from_reader(File::open(CHARACTER_DB_FILE_NAME).map_err(|e| {
-                DBError::FindingTable(format!("could not read from file: {:?}", e))
-            })?);
-        let records = rdr
-            .deserialize()
-            .into_iter()
-            .map(|result| -> Result<DBCharacter, DBError> {
-                result.map_err(|e| {
-                    DBError::ParsingRecord(format!("could not read row for record: {:?}", e))
-                })
-            })
-            .collect::<Result<Vec<DBCharacter>, DBError>>()?;
-        Ok(records)
+        self.read_db_records(CHARACTER_DB_FILE_NAME)
     }
 
     pub fn update_game_terrain(
