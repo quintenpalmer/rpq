@@ -92,12 +92,7 @@ impl DB {
     }
 
     pub fn get_game(&self, game_id: u32) -> Result<models::Game, DBError> {
-        for game in self.get_games()?.into_iter() {
-            if game.id == game_id {
-                return Ok(game);
-            }
-        }
-        return Err(DBError::FindingRecord("games".into()));
+        get_single_result(self.get_games()?, |game| game.id == game_id, "games")
     }
 
     fn read_db_games(&self) -> Result<Vec<DBGame>, DBError> {
@@ -116,12 +111,7 @@ impl DB {
     }
 
     pub fn get_map(&self, map_id: u32) -> Result<models::Map, DBError> {
-        for map in self.get_maps()?.into_iter() {
-            if map.id == map_id {
-                return Ok(map);
-            }
-        }
-        return Err(DBError::FindingRecord("map".into()));
+        get_single_result(self.get_maps()?, |record| record.id == map_id, "maps")
     }
 
     pub fn add_game(&self) -> Result<(), DBError> {
@@ -163,12 +153,7 @@ impl DB {
     }
 
     fn get_db_map(&self, map_id: u32) -> Result<DBMap, DBError> {
-        for record in self.read_db_maps()?.into_iter() {
-            if record.id == map_id {
-                return Ok(record);
-            }
-        }
-        return Err(DBError::FindingRecord("maps".into()));
+        get_single_result(self.read_db_maps()?, |record| record.id == map_id, "maps")
     }
 
     fn read_db_maps(&self) -> Result<Vec<DBMap>, DBError> {
@@ -411,4 +396,17 @@ fn map_model_from_db(m: DBMap, tiles: Vec<DBTileLine>) -> models::Map {
         hint_max_x: m.hint_max_x,
         hint_max_y: m.hint_max_y,
     }
+}
+
+pub fn get_single_result<T, F: Fn(&T) -> bool>(
+    results: Vec<T>,
+    cmp: F,
+    name: &'static str,
+) -> Result<T, DBError> {
+    for result in results.into_iter() {
+        if cmp(&result) {
+            return Ok(result);
+        }
+    }
+    return Err(DBError::FindingRecord(name.into()));
 }
