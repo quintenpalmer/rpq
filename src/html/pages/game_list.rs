@@ -33,7 +33,7 @@ pub fn page<'a>(games: Vec<models::Game>) -> elements::Body<'a> {
                             value: units::SourceValue::new("/games".into()),
                         }),
                         inputs: Vec::new(),
-                        button: elements::Button::style_less(htmldsl::text("add map game".into())),
+                        button: elements::Button::style_less(htmldsl::text("add map game")),
                         styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
                     }
                     .into_element()]

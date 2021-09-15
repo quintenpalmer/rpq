@@ -16,14 +16,14 @@ pub fn page<'a>(game: models::Game) -> elements::Body<'a> {
                 attributes::Href {
                     value: units::SourceValue::new(format!("/games/{}", game.id)),
                 },
-                vec![htmldsl::text("this game".into())],
+                vec![htmldsl::text("this game")],
             )
             .into_element(),
             elements::A::style_less(
                 attributes::Href {
                     value: units::SourceValue::new(format!("/games/{}/edit", game.id)),
                 },
-                vec![htmldsl::text("edit".into())],
+                vec![htmldsl::text("edit")],
             )
             .into_element(),
         ])

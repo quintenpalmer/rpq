@@ -15,7 +15,7 @@ pub fn page<'a>(map: models::Map) -> elements::Body<'a> {
             attributes::Href {
                 value: units::SourceValue::new(format!("/maps/{}", map.id)),
             },
-            vec![htmldsl::text("this map".into())],
+            vec![htmldsl::text("this map")],
         )
         .into_element()])
         .into_element(),
