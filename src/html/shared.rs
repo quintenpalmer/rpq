@@ -8,7 +8,7 @@ pub fn index_link() -> htmldsl::Element {
         attributes::Href {
             value: units::SourceValue::new("/".into()),
         },
-        vec![htmldsl::text("home".into())],
+        vec![htmldsl::text("home")],
     )
     .into_element()])
     .into_element()
@@ -19,7 +19,7 @@ pub fn maps_link() -> htmldsl::Element {
         attributes::Href {
             value: units::SourceValue::new("/maps".into()),
         },
-        vec![htmldsl::text("maps".into())],
+        vec![htmldsl::text("maps")],
     )
     .into_element()])
     .into_element()
@@ -30,7 +30,7 @@ pub fn games_link() -> htmldsl::Element {
         attributes::Href {
             value: units::SourceValue::new("/games".into()),
         },
-        vec![htmldsl::text("games".into())],
+        vec![htmldsl::text("games")],
     )
     .into_element()])
     .into_element()

@@ -143,7 +143,7 @@ impl models::Game {
             elements::P::style_less(maybe_append(
                 vec![
                     terrain.clone().into_html().into_element(),
-                    htmldsl::text("Terrain: ".into()),
+                    htmldsl::text("Terrain: "),
                     htmldsl::text(terrain.display_string()),
                 ],
                 if edit {
@@ -160,7 +160,7 @@ impl models::Game {
                         .map_or(current_selection_marker().into_element(), |x| {
                             x.into_html().into_element()
                         }),
-                    htmldsl::text("Character: ".into()),
+                    htmldsl::text("Character: "),
                     htmldsl::text(match o_character {
                         Some(v) => v.display_string(),
                         None => "--".into(),
@@ -244,7 +244,7 @@ fn build_terrain_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
                         )),
                     }),
                     inputs: Vec::new(),
-                    button: elements::Button::style_less(htmldsl::text("delete".into())),
+                    button: elements::Button::style_less(htmldsl::text("delete")),
                     styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
                 }
                 .into_element()]
@@ -288,7 +288,7 @@ fn build_character_adding_buttons<'a>(game_id: u32) -> elements::Div<'a> {
                         )),
                     }),
                     inputs: Vec::new(),
-                    button: elements::Button::style_less(htmldsl::text("delete".into())),
+                    button: elements::Button::style_less(htmldsl::text("delete")),
                     styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
                 }
                 .into_element()]
@@ -312,7 +312,7 @@ pub fn cursor_form_button(game_id: u32, dir: models::Direction, edit: bool) -> h
             }),
         }),
         inputs: Vec::new(),
-        button: elements::Button::style_less(htmldsl::text(symbol.into())),
+        button: elements::Button::style_less(htmldsl::text(symbol)),
         styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
     }
     .into_element()

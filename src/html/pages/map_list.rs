@@ -32,7 +32,7 @@ pub fn page<'a>(maps: Vec<models::Map>) -> elements::Body<'a> {
                             value: units::SourceValue::new("/maps".into()),
                         }),
                         inputs: Vec::new(),
-                        button: elements::Button::style_less(htmldsl::text("add map".into())),
+                        button: elements::Button::style_less(htmldsl::text("add map")),
                         styles: attributes::StyleAttr::new(vec![&styles::Display::Inline]),
                     }
                     .into_element()]
